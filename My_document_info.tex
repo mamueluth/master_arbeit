@@ -20,20 +20,18 @@
 % and the derived file thesis.tex.
 
 
-\title{My Title\\
-is Long\\
-very, very\\
-long}
+\title{Verteilte Mehrmaschinen-Regelung einer Roboter-zelle mittels ros2\_control
+}
 \titleotherlanguage{Mein Titel\\
 ist lang}
 
-\author{My Name}
-\address{My Address}
-\city{7613x Karlsruhe}
-\email{my.email@kit.edu}
+\author{Manuel Muth}
+\address{Berckmüllerstraße 1C}
+\city{76131 Karlsruhe}
+\email{uqdut@student.kit.edu}
 
-\keywords{Keywords, of, my, Thesis, Keywords, of, my, Thesis, Keywords, of, my, Thesis, Keywords, of, my, Thesis, Keywords, of, my, Thesis, Keywords, of, my, Thesis, Keywords, of, my, Thesis}
-\keywordsotherlanguge{Die, Stichw\"orter, f\"ur, meine, Arbeit, Die, Stichw\"orter, f\"ur, meine, Arbeit, Die, Stichw\"orter, f\"ur, meine, Arbeit, Die, Stichw\"orter, f\"ur, meine, Arbeit, Die, Stichw\"orter, f\"ur, meine, Arbeit}
+\keywords{distributed control, multiple controllers, ros2\_control, ROS2, control}
+\keywordsotherlanguge{verteilte Regelung, mehrere Regler, ros2\_control, ROS2, Regelung, Regelungstechnik}
 
 %% Study program or a seminar/subject
 \studyprogram{Intelligente Industrieroboter}
@@ -50,16 +48,16 @@ ist lang}
 % %% Insitute City (Default: 76131 Karlsruhe)
 % \institutecity{}
 
-\reviewerone{Prof. Dr.-Ing. Torsten Kröger}
-\reviewertwo{Prof. Dr.-Ing. habil. Björn Hein}
+\reviewerone{Prof. Dr.-Ing. habil. Björn Hein}
+\reviewertwo{Prof. Dr.-Ing. habil. Thomas Längle}
 %
 % %% The advisors are PhDs or Postdocs
-\advisorone{M.Sc. C}
+\advisorone{Dr.-Ing. Denis \v{S}togl}
 % %% The second advisor can be omitted
-\advisortwo{M.Sc. D}
+\advisortwo{}
 %
 % %% Please enter the start end end time of your thesis (for techreport not needed)
-\editingtime{xx. Month 20XX}{xx. Month 20XX}
+\editingtime{XX. Januar 2023}{XX. Juli 2023}
 
 %% --------------------------------
 %% | Settings for word separation |
@@ -86,19 +84,52 @@ ist lang}
 %% --------------------
 %% |   Bibliography   |
 %% --------------------
-\newcommand{\mybibliographyfiles}{Bibliography/ipr_articles,Bibliography/kit_template_example_bibliography,Bibliography/my_thesis_bibliography}
+\newcommand{\mybibliographyfiles}{Bibliography/ipr_articles,Bibliography/kit_template_example_bibliography,Bibliography/masterthesis}
 
 
 %% --------------------
 %% |     Acronyms     |
 %% --------------------
-\newacronym{ipr}{IAR-IPR}{Institute for Anthropomatics and Robotics - Intelligent Process Control and Robotics}
-
+\newacronym{dds}{DDS}{Data-Distribution Service}
+\newacronym{ros}{ROS}{Robot Operating System}
+\newacronym{ros2}{ROS2}{Robot Operating System 2}
+\newacronym{rsi}{RSI}{RobotSensorInterface}
+\newacronym{sm}{sm}{shared-memory}
 %% --------------------
 %% |     Glossary     |
 %% --------------------
-\newglossaryentry{robot}
+\newglossaryentry{ddsg}
 {
-    name=robot,
-    description={The robot developed in this work.}
+    name=\gls{dds},
+    description={\acrlong{dds} publish-subscribe communication based middleware standard for real-time and embedded systems \cite{noauthor_data_nodate}}
+}
+\newglossaryentry{rc}
+{
+    name=\texttt{ros\_control},
+    description={Framework for robot control in \gls{ros}}
+}
+\newglossaryentry{rosg}
+{
+    name=\gls{ros},
+    description={The \acrlong{ros} is a middleware based on a publisher-subsciber model. \gls{rosg} is mainly used in robotics and provides services for hardware abstraction and low-level control. Further, it comprises tools, libraries, and functionalities used in robotic applications.}
+}
+\newglossaryentry{ros2g}
+{
+    name=\gls{ros2},
+    description={\acrlong{ros2} is the second generation of the \acrlong{ros} \cite{macenski_robot_2022}}
+}
+\newglossaryentry{r2c}
+{
+    name=\texttt{ros2\_control},
+    description={Framework for real-time capable control using \gls{ros2}}
+}
+\newglossaryentry{rsig}
+{
+    name=\gls{rsi},
+    description={The \acrlong{rsi} serves as an interface for communication between the industrial robot and its sensor system }
+}
+\newglossaryentry{smg}
+{
+    name=\gls{sm},
+    description={\acrlong{sm}}
 }

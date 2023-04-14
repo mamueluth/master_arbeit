@@ -421,7 +421,7 @@
 	    \iflanguage{ngerman}{Betreuender Mitarbeiter}{Advisor}: & \hfill & \theadvisorone \\
 	  }{
 	    \iflanguage{ngerman}{Erster betreuender Mitarbeiter}{First advisor}: & \hfill & \theadvisorone \\
-	    { }\iflanguage{ngerman}{Zweiter betreuender Mitarbeiter}{Second advisor}: & \hfill & \theadvisortwo \\
+	    { }\iflanguage{ngerman}{Externer betreuender Mitarbeiter}{External advisor}: & \hfill & \theadvisortwo \\
 	  }
 	\fi
       \fi
