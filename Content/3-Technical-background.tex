@@ -1,70 +1,48 @@
-\chapter{\iflanguage{ngerman}{Technischer Hintergrund}{Technical background}}
-\label{sec:methods}
-\section{Hardware }
+\chapter{\iflanguage{ngerman}{Technischer Hintergrund}{Background}}
+\label{sec:background}
 
-\subsection{Robot Platforms}
-RSI used for communication with the robots
-\subsubsection{KUKA KR 16-2}
-
-\missingfigure{Please add some figures}
-
-\subsubsection{KUKA KR 5}
-\missingfigure{Please add some figures}
-
-
-
-
-
+%%%%%%%%%%%%%%%%%%%%%
+%       ROS2        %
+%%%%%%%%%%%%%%%%%%%%%
 \section{\gls{ros2}}
-The \gls{ros} is not an operating system in the classical sense \cite{quigley_ros_nodate, noauthor_ros_nodate}. Rather, ROS can be understood as a lightweight open-source collection of various software packages for robot development. It is a middleware that brings hardware abstraction, package management and communication between processes.\newline
-\gls{ros} however, has its limitations regarding security, reliability in non-traditional environments, and support for large scale embedded systems. \gls{ros2} is the second redesigned generation of \gls{ros}. \gls{ros2} was developed from the ground up with the goal of overcoming these challenges \cite{macenski_robot_2022}.
+The \gls{ros} is not an operating system in the classical sense. Rather, ROS can be understood as a lightweight open-source collection of various software packages for robot development. It is a middleware that brings hardware abstraction, package management and communication between processes \cite{quigley_ros_nodate, noauthor_ros_nodate}.\newline
+\gls{ros} however, has its limitations regarding security, reliability in non-traditional environments, and support for large scale embedded systems. \gls{ros2} is the second redesigned generation of \gls{ros}. \gls{ros2} was developed from the ground up with the goal of overcoming these challenges \cite{rico_concise_2022, macenski_robot_2022, liao_introduction_2020}.
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=1\textwidth]{Figures/c3/ros2_node_interfaces.png}
-	\caption{The \gls{ros2} node interfaces \cite{macenski_robot_2022}.}
+	\caption{Different communication patterns in \gls{ros2} organized under the \gls{node} interface \cite{macenski_robot_2022}.}
 	\label{c3_fig_ros2_node_interfaces}
 \end{figure}
+It is an open source software development kit distributed under the Apache 2.0 License and can be split into three categories. The middleware, algorithms and developer tools \cite{macenski_robot_2022}. 
+Written software can be divided thereby in dedicated parts, so-called \glspl{node}. In \gls{ros2} there is unified API which allows creating multiple communication patterns under the concept of \glspl{node}. This is represented in figure \ref{c3_fig_ros2_node_interfaces}. The most important concepts for this thesis are: \glspl{topic} and \glspl{service}. \Glspl{topic} provide an interface for passing \glspl{message} in an asynchronous manner. \Glspl{service} on the other hand, allow exchange of data in a request-response style pattern. Here, it is not mandatory that the client making the request blocks until the response arrives \cite{rico_concise_2022, macenski_robot_2022}.\newline
+In figure \ref{c3_fig_ros2_stack} the client library API stack of \gls{ros2} is shown. \gls{ros2} follows earlier design philosophies and consists of several abstraction layers distributed across different packages. These layers allow multiple solutions for needed functions and allow users to replace components or select specific parts of the system that they need. Most users interact with the client libraries like \gls{rclcpp} and \gls{rclpy}. The \gls{rclcpp} and \gls{rclpy} libraries provide access to the main communication APIs and are tailored to specific programming languages. \gls{ros2} supports distributed computing on multiple machines and processes, including integration with cloud resources. It uses an intermediate interface called \gls{rcl} for common functions, and underneath, the middleware abstraction layer called \gls{rmw} provides key communication interfaces. Different \gls{rmw} implementations representing different middleware technologies can be used interchangeably depending on performance, licensing, or platform requirements\cite{rico_concise_2022, macenski_robot_2022, liao_introduction_2020}. \newline
+The \gls{rmw} should be agnostic to \gls{dds} and the default middleware used in \gls{ros2} is eProsima's FastDDS.\cite{macenski_robot_2022, noauthor_ros_nodate-1, noauthor_eprosima_nodate}. More on different implementations of the \gls{dds} is presented in section \ref{c3_sec_dds}.
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=1\textwidth]{Figures/c3/ros2_client_library_stack.png}
-	\caption{The \gls{ros2} Client Library API Stack with the support of different \gls{dds} implementations shown \cite{macenski_robot_2022}.}
+	\caption{The \gls{ros2} client library API stack with the support of different \gls{dds} implementations shown \cite{macenski_robot_2022}.}
 	\label{c3_fig_ros2_stack}
 \end{figure}
-ROS supports several programming languages such as Python, C++ and LISP. Written software can be divided thereby in dedicated nodes, so-called Nodes. A Node is here an independent process, which can communicate over Topics with other Nodes, via messages. It is possible for several nodes to connect to a topic. Besides the communication by means of this publisher-subscriber model, which implements a kind of "broadcast", there is another concept of synchronous message transmission. This is called service and provides a simple request-response protocol.\todoBetter{rewrite and adapt to ros2}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   Data Exchange in Real-Time over Networks    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Data Exchange in Real-Time over Networks}\label{c3_sec_dds}
 
 
+\subsection{Fast DDS}
+\subsection{Cyclon DDS}
 
 
+\subsection{Zenoh}
+\href{https://www.adlinktech.com/en/Zenoh}{Zenoh} 
 
-
-
-\section{The \gls{r2c} Control Framework}\label{ros2_control}
-\Gls{r2c} is an open-source framework for real-time control, initially released for  \gls{ros2} Foxy. It is a rewrite of \gls{rc}, with the goal to simplify integration of new hardware and overcome some drawbacks present in \gls{rc} \cite{noauthor_welcome_nodate, magyar_getting_started_with_ros2_control_2021, magyar_ros2_control_the_future_of_ros_control_2021}. As shown in table \ref{c3_tab_r2c_repos} the framework comprises multiple repositories. It includes core functionality like management of controllers and hardware, as well as common controllers. Besides, it provides low-level tools for control theory and real-time control. \newline
-A more detailed view of the internals of the \gls{r2c} framework is presented in figure \ref{c3_fig_ros2_control_uml}. As can be seen, the framework includes a controller manager. The controller is responsible for managing the controllers and connects them to the abstracted hardware. Additionally, it serves as entry-point for users and provides \gls{ros2} services through which the user can interact with the system. The controller manager has a resource manager, which in turn is responsible for storing and management of the hardware. The hardware is abstracted through interfaces \newline
-The control loop itself consist of three steps:
-\lstset{language=C++,basicstyle=\scriptsize}
-\begin{lstlisting}[caption=Pseudo code for the control loop.]
-// creat controller manager with an rclcpp::executor
-auto cm = 
-    std::make_shared<controller_manager::ControllerManager>(executor, cm_node_name);
-while (rclcpp::ok())
-{   
-    // calculated meassured_period
-    // execute update loop
-    cm->read(cm->now(), measured_period);
-    cm->update(cm->now(), measured_period);
-    cm->write(cm->now(), measured_period);
-    //sleep until next iteration
-}
-\end{lstlisting}\label{c3_code_control_loop}
-
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=1\textwidth]{Figures/c3/ros2_control_uml.png}
-	\caption{UML diagram of the most important classes and interfaces in the \gls{r2c} framework. Picture taken from \cite{noauthor_welcome_nodate}. }
-	\label{c3_fig_ros2_control_uml}
-\end{figure}\todoBetter{Replace with own figure}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   The ros2_control Framework  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The \gls{r2c} Framework}\label{ros2_control}\todo{shared-memory is missing}
+\Gls{r2c} is an open-source framework for real-time control, initially released for  \gls{ros2} Foxy. It is a rewrite of \gls{rc}, with the goal to simplify integration of new hardware and overcome some drawbacks present in \gls{rc} \cite{noauthor_welcome_nodate, magyar_getting_started_with_ros2_control_2021, magyar_ros2_control_the_future_of_ros_control_2021}. As shown in table \ref{c3_tab_r2c_repos} the framework comprises multiple repositories. It includes core functionality like management of controllers and hardware, as well as implementations of commonly used controllers. Besides, it provides low-level tools for control theory and real-time control. \newline
+A more detailed view of the internals of the \gls{r2c} framework is presented in figure \ref{c3_fig_ros2_control_uml}. As can be seen, the framework includes a controller manager. The controller 
 \begin{table}[htbp]
     \centering
 \begin{tabular}{ |c|c| }
@@ -104,24 +82,75 @@ Repository & Description  \\
 \end{tabular}
     \caption{Overview of the repositories the \gls{r2c} framework includes.}
     \label{c3_tab_r2c_repos}
-\end{table}
+\end{table}manager serves as entry-point for users and provides \gls{ros2} services through which the user can interact with the system. Additionally, it is responsible for managing the controllers and connects them to the abstracted hardware. The abstraction from the physical hardware and drivers is handled by the resource manager. The resource manager is part of the controller manager. Moreover, the resource manager stores and manages the hardware inside a resource storage. The hardware abstraction is done through interfaces (called \textit{hardware components}). These \textit{hardware components} can be divided into three groups:
+\begin{itemize}
+    \item Actuator (\texttt{ActuatorInterface}): Robotic hardware like motors, valves, and other simple 1-\gls{dof} actuators.
+    \item Sensor (\texttt{SensorInterface}) Robotic hardware that can sens and measure physical properties of the environment.
+    \item System (\texttt{SystemInterface}): Complex multi-\gls{dof} robotic hardware like an industrial robot.
+\end{itemize}
+ Finally, there is a collection of controllers inside the \texttt{ros2\_controllers} repositories. Controllers are the units responsible fore calculating a system's input. The input is thereby calculated based on the measured error between a reference value and the system's output.\todoBetter{Add reference}\newline
+ In conclusion, the framework can roughly be divided into two parts. The first part includes the controllers and the second part embraces the hardware. The controller manager connects those parts and serves as an entry-point for users to interact with the system.
+
+\subsection{The Link between Controllers and Hardware}\label{c3_sec_link_ctrl_hw}
+A very important concept to understand for this thesis are the \texttt{CommandInterface} and the \texttt{StateInterface}. As shown in figure \ref{c3_fig_ros2_control_uml} in the middle above, the \texttt{CommandInterface}\todoBetter{Fix} and \texttt{StateInterface} are located between the hardware site and the controller site of the \gls{r2c} framework. They abstract away from the hardware. The resource manager stores and manages them. \texttt{StateInterface} grands access to the state of the component, while \texttt{CommandInterface} additionally enables to write commands to a hardware component. If a controller wants to get access to the hardware, the resource manager creates so-called loans (\texttt{LoanedCommandInterface}/\texttt{LoanedStateInterface}). Those loaned interfaces are then passed to the controller. The controller can then read the state and write commands to the hardware via those loans.
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=1\textwidth]{Figures/c3/ros2_control_uml.png}
+	\caption{UML diagram of the most important classes and interfaces in the \gls{r2c} framework. Picture taken from \cite{noauthor_welcome_nodate}. }
+	\label{c3_fig_ros2_control_uml}
+\end{figure}\todoBetter{Replace with own figure}
+ 
+\subsection{Controller Chaining}
+Controller chaining in \gls{r2c} describes the possibility to link the output of one controller to the input of another. The chaining can thereby be in sequence (cascade control) or in parallel.\newline
+For a controller to be able to be chained, it has to derive from the \texttt{ChainableControllerInterface}\todoBetter{Fix} instead of the \texttt{ControllerInterface}. The chainable controller must then export reference interfaces. Those reference interfaces have the same meaning as the \texttt{CommandInterfaces}. The controller can then run in either chained or external mode, where the latter is equivalent to a non chainable controller. If the controller runs in chained mode, all external interfaces like subscriber and services are disabled. This is done in order to avoid concurrency in the input commands. Another controller can then claim the reference interfaces and chain its output to the input of the chainable controller.
+%  The control loop can be consist of three steps:
+% \lstset{language=C++,basicstyle=\scriptsize}
+% \begin{lstlisting}[caption=Pseudo code for the control loop.]
+% // creat controller manager with an rclcpp::executor
+% auto cm = 
+%     std::make_shared<controller_manager::ControllerManager>(executor, cm_node_name);
+% while (rclcpp::ok())
+% {   
+%     // calculated meassured_period
+%     // execute update loop
+%     cm->read(cm->now(), measured_period);
+%     cm->update(cm->now(), measured_period);
+%     cm->write(cm->now(), measured_period);
+%     //sleep until next iteration
+% }
+% \end{lstlisting}\label{c3_code_control_loop}
+
+\subsection{Controlling Multiple Robots with \gls{r2c}}\label{c3_sec_controlling_multiple_robots}
+In the current state, \gls{r2c} focuses on controlling a single robot or robot cell. Controlling multiple robots is however possible. Depending on the task, control of multiple robots in the current state of \gls{r2c} can roughly be split into two scenarios.
+\begin{enumerate}[start=1,label={\upshape \texttt{Scenario \arabic*:}},wide = 0pt, leftmargin = 3em]
+    \item Task where tight synchronization is needed. $\implies$ One platform with one controller manager. Represented in figure \ref{c3_fig_r2c_mr_ts}.
+    \item Task where robots act more or less independent of one another. $\implies$ Multiple platforms with multiple independent controller managers. This can be seen in graphic \ref{c3_fig_r2c_mr_is}.
+\end{enumerate}
+
+\paragraph{Scenario 1:} 
+In the first scenario, where a tight synchronization between the robots is needed, the most feasible way is to create on controller manager and multiple systems. One system for each robot. Each system can then be controlled by its own controller architecture. The controllers of those architectures are in turn managed by on controller manager. This controller manager can then handle the synchronization between the different systems.\newline
+One should note, that this approach is limited to one machine. In the current form of \gls{r2c} there is no way to communicate between multiple controller managers. An outline of the architecture is given in representaion \ref{c3_fig_r2c_mr_ts}.
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=1\textwidth]{Figures/c3/multiple_robots_one_system_current-Page-1.pdf}
+	\caption{Schematic figure of how to realize a setup of multiple robots in \gls{r2c} where a tight synchronization between the robots is needed.}
+	\label{c3_fig_r2c_mr_ts}
+\end{figure}
+
+\paragraph{Scenario 2:} 
+In the second scenario, where no tight synchronization is needed and the robots act in a more or less independent manner, the most feasible way would be to have multiple machines with multiple controller managers running. Each controller manager would then have its own system. The system can then have its own controller architecture, which is managed by the corresponding controller manager. \newline
+In this case, however, the systems are completely independent of each other. This means there is no synchronization between different systems possible. At least, there is no built-in functionality in \gls{r2c}. A schematic representation of this approach is provided in figure \ref{c3_fig_r2c_mr_is}.
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=1\textwidth]{Figures/c3/multiple_independent_robots_current.pdf}
+	\caption{Schematic figure of how to realize a setup of multiple robots in \gls{r2c} where the robots act in an independent manner.}
+	\label{c3_fig_r2c_mr_is}
+\end{figure}
 
 
-
-\subsection{Real-Time Capability of \gls{ros2} and \gls{r2c}}
-
-\subsection{Controlling Multiple Robots with \gls{r2c}}
+\subsection{Real-Time Capability of \gls{r2c}}
 
 
-
-
-\section{Echtzeitfähige Netzwerke}
-
-
-\subsection{Fast DDS}
-
-
-\subsection{Cyclon DDS}
 
 
 

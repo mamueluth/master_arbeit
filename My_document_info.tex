@@ -20,10 +20,10 @@
 % and the derived file thesis.tex.
 
 
-\title{Verteilte Mehrmaschinen-Regelung einer Roboter-zelle mittels ros2\_control
+\title{Distributed Control of Multiple Robots Using ros2\_control}
+
+\titleotherlanguage{Verteilte Mehrmaschinen-Regelung einer Roboterzelle mittels ros2\_control
 }
-\titleotherlanguage{Mein Titel\\
-ist lang}
 
 \author{Manuel Muth}
 \address{Berckmüllerstraße 1C}
@@ -57,7 +57,7 @@ ist lang}
 \advisortwo{}
 %
 % %% Please enter the start end end time of your thesis (for techreport not needed)
-\editingtime{XX. Januar 2023}{XX. Juli 2023}
+\editingtime{03. Januar 2023}{03. Juli 2023}
 
 %% --------------------------------
 %% | Settings for word separation |
@@ -90,46 +90,88 @@ ist lang}
 %% --------------------
 %% |     Acronyms     |
 %% --------------------
+\newacronym{dof}{DOF}{Degree of Freedom}
 \newacronym{dds}{DDS}{Data-Distribution Service}
+\newacronym{ipr}{IAR-IPR}{Institute for Anthropomatics and Robotics - Intelligent Process Control and Robotics}
+\newacronym{kit}{KIT}{Karlsruhe Institute of Technology}
+\newacronym{rcl}{rcl}{\gls{ros} Client Library}
+\newacronym{rclcpp}{rclcpp}{\gls{ros} Client Library C++}
+\newacronym{rclpy}{rclpy}{\gls{ros} Client Library Python}
 \newacronym{ros}{ROS}{Robot Operating System}
 \newacronym{ros2}{ROS2}{Robot Operating System 2}
 \newacronym{rsi}{RSI}{RobotSensorInterface}
+\newacronym{rmw}{rmw}{\gls{ros} middleware}
 \newacronym{sm}{sm}{shared-memory}
 %% --------------------
 %% |     Glossary     |
 %% --------------------
 \newglossaryentry{ddsg}
 {
-    name=\gls{dds},
-    description={\acrlong{dds} publish-subscribe communication based middleware standard for real-time and embedded systems \cite{noauthor_data_nodate}}
+    name={\gls{dds}},
+    description={\acrlong{dds} publish-subscribe a communication based middleware standard for real-time and embedded systems \cite{noauthor_data_nodate}}
+}
+\newglossaryentry{dofg}
+{
+    name={\gls{dof}},
+    description={\acrlong{dof}}
+}
+\newglossaryentry{node}
+{
+    name={\textit{node}},
+    description={Can be understood as a fundamental software component that is used for communication and computation in \gls{ros} and \gls{ros2}. Builds the organizing endpoint int the computional graph. It can perform various tasks such as sensing, actuating, processing, and interfacing with other nodes to exchange data or trigger actions},
+    plural={\textit{nodes}}
+}
+\newglossaryentry{nodelet}
+{
+    name={\textit{nodelet}},
+    description={Simliar to a \gls{node} in \gls{ros} but with the ability to run multiple nodlets in one process},
+    plural={\textit{nodelets}}
+}
+\newglossaryentry{message}
+{
+    name={\textit{message}},
+    description={Datatype in \gls{ros} and \gls{ros2} used when communication via \glspl{topic}},
+    plural={\textit{messages}}
 }
 \newglossaryentry{rc}
 {
-    name=\texttt{ros\_control},
+    name={\textit{ros\_control}},
     description={Framework for robot control in \gls{ros}}
 }
 \newglossaryentry{rosg}
 {
-    name=\gls{ros},
-    description={The \acrlong{ros} is a middleware based on a publisher-subsciber model. \gls{rosg} is mainly used in robotics and provides services for hardware abstraction and low-level control. Further, it comprises tools, libraries, and functionalities used in robotic applications.}
+    name={\gls{ros}},
+    description={The \acrlong{ros} is a middleware based on a publisher-subsciber model. \gls{rosg} is mainly used in robotics and provides services for hardware abstraction and low-level control. Further, it comprises tools, libraries, and functionalities used in robotic applications}
 }
 \newglossaryentry{ros2g}
 {
-    name=\gls{ros2},
+    name={\gls{ros2}},
     description={\acrlong{ros2} is the second generation of the \acrlong{ros} \cite{macenski_robot_2022}}
 }
 \newglossaryentry{r2c}
 {
-    name=\texttt{ros2\_control},
+    name={\textit{ros2\_control}},
     description={Framework for real-time capable control using \gls{ros2}}
 }
 \newglossaryentry{rsig}
 {
-    name=\gls{rsi},
+    name={\gls{rsi}},
     description={The \acrlong{rsi} serves as an interface for communication between the industrial robot and its sensor system }
+}
+\newglossaryentry{service}
+{
+    name={\textit{service}},
+    description={A service is a communication mechanism in \gls{ros} and \gls{ros2} that allows \glspl{node} to request and receive a response in a client-server pattern},
+    plural={\textit{services}}
 }
 \newglossaryentry{smg}
 {
-    name=\gls{sm},
+    name={\gls{sm}},
     description={\acrlong{sm}}
+}
+\newglossaryentry{topic}
+{
+    name={\textit{topic}},
+    description={In the context of \gls{ros} and \gls{ros2} a topic is a communication mechanism. Topics provide a publisher-subscriber based exchange mechanism of \glspl{message} for \glspl{node}},
+    plural={\textit{topics}}
 }

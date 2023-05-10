@@ -4,4 +4,19 @@
 \chapter{\iflanguage{ngerman}{Einleitung}{Introduction}}
 \label{sec:Introduction}
 %% ==============================
+\section{Motivation}
 Roboter immer wichtiger, überall Roboter. \gls{ros2} de facto Standard. Steuerung und Regelung von Roboter ist Grundlage von all den Anwendungen, was nützt Roboter, wenn er sich nicht bewegt. Das \gls{r2c} Framework ist für Steuerung und Regelung in \gls{ros2} das Standard-Framework. Nur \gls{sm} Architektur. \todoAddin{Warum wollen wir verteilte Regelung?}
+
+While controllers for modern robots often appear to users as monolithic black-boxes, approaches exist to write custom controllers and tune them with tools from community based frameworks. Using ROS2 as such a framework, single components and parameters can be exchanged and customized easily. Especially in research institutions but also in industrial environments, this framework is used increasingly to fulfill the demanding requirements of robotic control. While ROS1 had no real-time capable method of communication, ROS2 promises to give this advantage. Matching the trend to use many distributed, specialized and small systems instead of one higly systemspecific, inflexible system, this study assesses tuning of DDS parameters in order to improve communication speed. \cite{plasberg_towards_2022} \newline
+monolithic black-box controller made by the individual robotic manufacturers commonly controls modern industrial robots. The setup’s single components are not accessible nor exchangeable, often due to them being specially tuned and adjusted to fulfill the demanding requirements for robotic control. The open-source framework ROS enables to combine these monolithic controllers with simple interfaces, therefore allowing more complex robotic applications. The next generation, ROS2, targets highly modular systems of sensors, actuators and controllers, each being interchangeable and further providing real-time capabilities by employing DDS as middleware. This study uses system inherent tools alongside non-invasive measurements for comprehensive insights, thereby guiding to ROS2 applications on an underlying distributed and synchronized real-time Linux system.\cite{puck_distributed_2020}
+
+\section{Scope of this Thesis}
+
+\section{Thesis Outline}
+\paragraph{\hyperref[sec:state_of_the_art]{Section 2: State of the Art}}
+\paragraph{\hyperref[sec:background]{Section 3: Background}}
+In the third chapter gives an overview and introduction to framework and technologies this thesis relies on. First, the \gls{ros} as well as its successor \gls{ros2} are introduced. Then the current state of the \gls{r2c} framework is presented and the most important concepts are introduced. In the last section of this chapter, different middlewares for \gls{ros2} are presented.
+\paragraph{\hyperref[sec:concept]{Section 4: Concept}}
+\paragraph{\hyperref[sec:implementation]{Section 5: Implementation}}
+\paragraph{\hyperref[sec:results]{Section 6: Results}}
+\paragraph{\hyperref[sec:conclusion_and_outlook]{Section 7: Conclusion and Outlook}}

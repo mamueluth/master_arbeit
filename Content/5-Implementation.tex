@@ -4,7 +4,10 @@
 \chapter{\iflanguage{ngerman}{Implementierung}{Implementation}}
 \label{sec:implementation}
 
-\section{Porting of the KUKA RSI from \gls{ros} to \gls{ros2} }
+\section{Porting of the KUKA RSI to \gls{ros2} Rolling}
+The concept should later be tested with real hardware at the \gls{kit} \gls{ipr}. The used hardware are KUKA robots. The \gls{rsi} was only available for older versions of \gls{ros} and needed to be ported.\newline
+
+
 Creation of Hardware to run UDP server and creation of control node. Ignore controller manager's update rate. Synchronization via blocking read() timing issues. Usage of a steady clock.
 
 \section{Preparation Work}
