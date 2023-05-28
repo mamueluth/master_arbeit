@@ -1,5 +1,16 @@
 %% ==============================
 \chapter{\iflanguage{ngerman}{Stand der Wissenschaft und Technik}{State of the Art}}
 \label{sec:state_of_the_art}
-\section{Control}
-\section{Distributed control}
+Gutiérrez et al. showed in their paper that with \gls{ros2} version Ardent, initially released in December 2017, it became feasible to do soft real-time robotics over the network \cite{gutierrez_towards_2018}. The study evaluated the communication capabilities of \gls{ros2} in a scenario
+\begin{wrapfigure}{r}{7cm}
+\includegraphics[width=7cm]{Figures/c2/Gutiérrez_toward_distributed_and_real-time.png}
+\caption{The experimental setup used by Gutiérrez et al. to evaluate the real-time performance of \gls{ros2} communication over Ethernet. Figure taken from \cite{gutierrez_towards_2018}.} \label{c2_fig_gutierrez_experimental_seutp}
+\end{wrapfigure}
+for communication between robot components under Linux. By measuring worst-case latencies and missed deadlines, the authors analyzed the impact of computation and network congestion on communication latencies. The experimental setup can be seen in figure \ref{c2_fig_gutierrez_experimental_seutp} and consisted of an embedded device and a Linux PC. They then measured the round-trip time between the embedded device and the Linux PC. This was done with different DDS middleware implementations. With their results, they showed that configuring the \gls{ros2} framework and DDS threads significantly reduced jitter and worst-case latencies. However, in their work they also highlighted the limitations of the Linux network stack, especially for non-critical traffic. Using Linux traffic control \gls{qos} methods, those limitations could be minimized. They concluded that soft real-time communication over Ethernet to be possible, but not hard real-time \cite{gutierrez_towards_2018}. \newline
+
+\todoin{Old has to be removed}
+Keine Ahnung lauter bla bla bla das in die cloud verlegt werden soll der neue große trend aber weiß nicht ob das so wirklich passt "Edge robotics: are we ready? an experimental evaluation of current vision and future directions" \cite{groshev_edge_2023} \newline
+Hier dass distributed network control das trending Forschunthema ist aber glaub das ist nicht die Richtung die ich mache: Networked Control Systems: A Survey of Trends and Techniques \cite{zhang_networked_2020} \newline
+An Overview of Industrial Robots Control and Programming Approaches
+Towards Distributed Real-Time capable Robotic Control using ROS2 describes that it should theoretically be possible (Conclusion).
+

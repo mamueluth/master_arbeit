@@ -15,8 +15,8 @@ The \gls{ros} is not an operating system in the classical sense. Rather, ROS can
 \end{figure}
 It is an open source software development kit distributed under the Apache 2.0 License and can be split into three categories. The middleware, algorithms and developer tools \cite{macenski_robot_2022}. 
 Written software can be divided thereby in dedicated parts, so-called \glspl{node}. In \gls{ros2} there is unified API which allows creating multiple communication patterns under the concept of \glspl{node}. This is represented in figure \ref{c3_fig_ros2_node_interfaces}. The most important concepts for this thesis are: \glspl{topic} and \glspl{service}. \Glspl{topic} provide an interface for passing \glspl{message} in an asynchronous manner. \Glspl{service} on the other hand, allow exchange of data in a request-response style pattern. Here, it is not mandatory that the client making the request blocks until the response arrives \cite{rico_concise_2022, macenski_robot_2022}.\newline
-In figure \ref{c3_fig_ros2_stack} the client library API stack of \gls{ros2} is shown. \gls{ros2} follows earlier design philosophies and consists of several abstraction layers distributed across different packages. These layers allow multiple solutions for needed functions and allow users to replace components or select specific parts of the system that they need. Most users interact with the client libraries like \gls{rclcpp} and \gls{rclpy}. The \gls{rclcpp} and \gls{rclpy} libraries provide access to the main communication APIs and are tailored to specific programming languages. \gls{ros2} supports distributed computing on multiple machines and processes, including integration with cloud resources. It uses an intermediate interface called \gls{rcl} for common functions, and underneath, the middleware abstraction layer called \gls{rmw} provides key communication interfaces. Different \gls{rmw} implementations representing different middleware technologies can be used interchangeably depending on performance, licensing, or platform requirements\cite{rico_concise_2022, macenski_robot_2022, liao_introduction_2020}. \newline
-The \gls{rmw} should be agnostic to \gls{dds} and the default middleware used in \gls{ros2} is eProsima's FastDDS.\cite{macenski_robot_2022, noauthor_ros_nodate-1, noauthor_eprosima_nodate}. More on different implementations of the \gls{dds} is presented in section \ref{c3_sec_dds}.
+In figure \ref{c3_fig_ros2_stack} the client library API stack of \gls{ros2} is shown. \gls{ros2} follows earlier design philosophies and consists of several abstraction layers distributed across different packages. These layers allow multiple solutions for needed functions and allow users to replace components or select specific parts of the system that they need. Most users interact with the client libraries like \gls{rclcpp} and \gls{rclpy}. The \gls{rclcpp} and \gls{rclpy} libraries provide access to the main communication APIs and are tailored to specific programming languages. \gls{ros2} supports distributed computing on multiple machines and processes, including integration with cloud resources. It uses an intermediate interface called \gls{rcl} for common functions, and underneath, the middleware abstraction layer called \gls{rmw} provides key communication interfaces. Different \gls{rmw} implementations representing different middleware technologies can be used interchangeably depending on performance, licensing, or platform requirements \cite{rico_concise_2022, macenski_robot_2022, liao_introduction_2020}. \newline
+The \gls{rmw} should be agnostic to \gls{dds} and the default middleware used in \gls{ros2} is eProsima's FastDDS \cite{macenski_robot_2022, noauthor_ros_nodate-1, noauthor_eprosima_nodate}. A more detailed introduction to \gls{dds} and to different implementations of \gls{dds} is given in section \ref{c3_sec_dds}.
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=1\textwidth]{Figures/c3/ros2_client_library_stack.png}
@@ -27,21 +27,77 @@ The \gls{rmw} should be agnostic to \gls{dds} and the default middleware used in
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   Data Exchange in Real-Time over Networks    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Data Exchange in Real-Time over Networks}\label{c3_sec_dds}
+\section{OMG Data Distribution Service}\label{c3_sec_dds}
+The \glsentryfull{dds} is an open international middleware standard for real-time and embedded systems\cite{noauthor_data_nodate}. It is designed to facilitate efficient and reliable communication between distributed systems and devices in a wide range of industries.\newline 
+DDS provides a data-centric publish-subscribe communication model, where data producers (publishers) publish data on specific topics, and data consumers (subscribers) can subscribe to those topics. The subscriber then receives the corresponding data via the topic. DDS ensures that the data is delivered reliably and in a timely manner to all interested subscribers. \cite{pardo-castellote_omg_2003, schlesselman_omg_2004}.
 
+Some of the key features of \gls{dds} are listed below:\todo{rewrite!!!!}
+\begin{itemize}
+    \item \gls{qos}: DDS allows fine-grained control over various quality-of-service parameters to meet the specific requirements of different applications. \gls{qos} settings include reliability, bandwidth, delivery deadlines, and resource limits.
 
-\subsection{Fast DDS}
-\subsection{Cyclon DDS}
+    \item Data-centricity: DDS focuses on the data itself, rather than the underlying transport or network infrastructure. It enables decoupling of data producers and consumers, allowing flexible and dynamic system configurations.
 
+    \item Scalability: DDS supports both local and distributed systems, allowing seamless communication across multiple nodes, networks, or even geographically dispersed systems. It can handle large-scale deployments with high data rates and low latency.
 
-\subsection{Zenoh}
+    \item Interoperability: DDS promotes interoperability between different vendors and platforms. Applications built using DDS can communicate with each other regardless of the programming language, operating system, or hardware used, as long as they adhere to the DDS standard.
+
+    \item Extensibility: DDS provides a modular and extensible architecture, allowing additional functionality and customizations to be added through optional extensions and profiles.
+
+\end{itemize}
+\begin{table}[htbp]
+    \centering
+\begin{tabular}{ |c|c|c|c| }
+\hline
+\multicolumn{4}{|c|}{Overview of the used \gls{rmw}s} \\
+\hline
+Product name & License & \gls{rmw} implementation & status  \\
+\hline
+\hline
+eProsima Fast DDS & Apache 2 & rmw\_fastrtps\_cpp & 
+    \begin{minipage}{4.5cm}
+	    \vskip 8pt
+		  Full support. \textbf{Default} \textbf{RMW}. Packaged with binary releases.
+	    \vskip 8pt
+	\end{minipage} \\\hline
+ Eclipse Cyclone DDS & \begin{minipage}{2cm} \vskip 8pt Eclipse Public License v2.0 \vskip 8pt\end{minipage} & rmw\_cyclonedds\_cpp & 
+    \begin{minipage}{4.5cm}
+	   \vskip 8pt
+      Full support. Packaged with binary releases.\newline\newline
+	   \vskip 8pt
+	\end{minipage} \\\hline
+ RTI Connext DDS & \begin{minipage}{2cm} \vskip 8pt commercial, research \vskip 8pt\end{minipage} & rmw\_connext\_cpp & 
+    \begin{minipage}{4.5cm}
+	   \vskip 8pt
+		 Full support. Support included in binaries, but Connext installed separately.
+	   \vskip 8pt
+	\end{minipage} \\\hline\hline
+  Eclipse Zenoh & Apache 2 & $-$ & \begin{minipage}{4.5cm}
+	 \vskip 8pt
+		 Via Zenoh bridge for DDS. DDS publisher/subscribers are mirrored and communication routed through Zenoh.
+	 \vskip 8pt
+	\end{minipage} \\\hline
+\end{tabular}
+    \caption{Overview of the repositories the \gls{r2c} framework includes.}
+    \label{c3_tab_r2c_repos}
+\end{table}
+
+\subsection{Data Exchange in Real-Time over Networks}
+
+\subsubsection*{Fast DDS}
+
+\subsubsection*{Cyclon DDS}
+Cyclon DDS is an implementation of the 
+\subsubsection*{Connext DDS}
+\subsubsection*{Zenoh}
+Zenoh is a publisher, subscriber and query protocol by the Eclipse foundation.
 \href{https://www.adlinktech.com/en/Zenoh}{Zenoh} 
+\href{https://zenoh.io/blog/2021-03-23-discovery/}{Zenoh advatages} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   The ros2_control Framework  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{The \gls{r2c} Framework}\label{ros2_control}\todo{shared-memory is missing}
-\Gls{r2c} is an open-source framework for real-time control, initially released for  \gls{ros2} Foxy. It is a rewrite of \gls{rc}, with the goal to simplify integration of new hardware and overcome some drawbacks present in \gls{rc} \cite{noauthor_welcome_nodate, magyar_getting_started_with_ros2_control_2021, magyar_ros2_control_the_future_of_ros_control_2021}. As shown in table \ref{c3_tab_r2c_repos} the framework comprises multiple repositories. It includes core functionality like management of controllers and hardware, as well as implementations of commonly used controllers. Besides, it provides low-level tools for control theory and real-time control. \newline
+\section{The \gls{r2c} Framework}\label{ros2_control}\todoImportant{shared-memory is missing}
+The open-source framework \gls{r2c}, is a framework for real-time control, initially released for \gls{ros2} Foxy. It is a rewrite of \gls{rc}, with the goal to simplify integration of new hardware and overcome some drawbacks present in \gls{rc} \cite{noauthor_welcome_nodate, magyar_getting_started_with_ros2_control_2021, magyar_ros2_control_the_future_of_ros_control_2021}. As shown in table \ref{c3_tab_r2c_repos} the framework comprises multiple repositories. It includes core functionality like management of controllers and hardware, as well as implementations of commonly used controllers. Besides, it provides low-level tools for control theory and real-time control. \newline
 A more detailed view of the internals of the \gls{r2c} framework is presented in figure \ref{c3_fig_ros2_control_uml}. As can be seen, the framework includes a controller manager. The controller 
 \begin{table}[htbp]
     \centering
@@ -82,7 +138,8 @@ Repository & Description  \\
 \end{tabular}
     \caption{Overview of the repositories the \gls{r2c} framework includes.}
     \label{c3_tab_r2c_repos}
-\end{table}manager serves as entry-point for users and provides \gls{ros2} services through which the user can interact with the system. Additionally, it is responsible for managing the controllers and connects them to the abstracted hardware. The abstraction from the physical hardware and drivers is handled by the resource manager. The resource manager is part of the controller manager. Moreover, the resource manager stores and manages the hardware inside a resource storage. The hardware abstraction is done through interfaces (called \textit{hardware components}). These \textit{hardware components} can be divided into three groups:
+\end{table}
+manager serves as entry-point for users and provides \gls{ros2} services through which the user can interact with the system. Additionally, it is responsible for managing the controllers and connects them to the abstracted hardware. The abstraction from the physical hardware and drivers is handled by the resource manager. The resource manager is part of the controller manager. Moreover, the resource manager stores and manages the hardware inside a resource storage. The hardware abstraction is done through interfaces (called \textit{hardware components}). These \textit{hardware components} can be divided into three groups:
 \begin{itemize}
     \item Actuator (\texttt{ActuatorInterface}): Robotic hardware like motors, valves, and other simple 1-\gls{dof} actuators.
     \item Sensor (\texttt{SensorInterface}) Robotic hardware that can sens and measure physical properties of the environment.
@@ -149,6 +206,16 @@ In this case, however, the systems are completely independent of each other. Thi
 
 
 \subsection{Real-Time Capability of \gls{r2c}}
+
+\section{Time Synchronized Networks}
+What's the difference?????
+\section{Time Sensitive Networks}
+
+\section{Preempt-RT Linux}
+Take a look at "Distributed and Synchronized Setup towards Real-Time Robotic Control using ROS2 on Linux" state of the art
+
+\section{The Used Hardware}
+\subsection{Industrial Robots for Evaluation}
 
 
 
