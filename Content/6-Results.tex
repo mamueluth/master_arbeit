@@ -2,28 +2,117 @@
 \chapter{\iflanguage{ngerman}{Ergebnisse}{Results}}
 \label{sec:results}
 %% ==============================
-\section{Hardware }
+\section{Experimental Setup for Evaluation}
+Network card : lshw command
+cpu : lscpu
+memory: sudo dmidecode --type 17
 
-\subsection{Robot Platforms}
-RSI used for communication with the robots
-\subsubsection{KUKA KR 16-2}
+\begin{table}[htbp]
+    \centering
+\begin{tabular}{ |c|c|c|c| }
+\hline
+\multicolumn{4}{|c|}{Overview of PCs used for the evaluation} \\
+\hline
+& PC1 & PC2 & PC3  \\
+\hline
+\hline
+\textbf{Hardware} &  &  & \\\hline
+    Processor &
+        \begin{minipage}{3.9cm}
+	       \vskip 8pt
+		      16 $\times$ AMD Ryzen 7 5800H with Radeon Graphics
+	       \vskip 8pt
+	    \end{minipage} & 
+        \begin{minipage}{3.9cm}
+    	    \vskip 8pt
+    		   16 $\times$ AMD Ryzen 7 5800H with Radeon Graphics
+    	    \vskip 8pt
+	    \end{minipage} & 
+        \begin{minipage}{3.9cm}
+	       \vskip 8pt
+		      16 $\times$ AMD Ryzen 7 5800H with Radeon Graphics
+	       \vskip 8pt
+	    \end{minipage} \\\hline
+    RAM &
+        \begin{minipage}{3.9cm}
+	       \vskip 8pt
+		      2 $\times$ 32GB DDR4 Samsung SODIMM 3200 MT/s
+	       \vskip 8pt
+	    \end{minipage} & 
+        \begin{minipage}{3.9cm}
+    	    \vskip 8pt
+    		   2 $\times$ 32GB DDR4 Samsung SODIMM 3200 MT/s
+    	    \vskip 8pt
+	    \end{minipage} & 
+        \begin{minipage}{3.9cm}
+	       \vskip 8pt
+		      2 $\times$ 32GB DDR4 Samsung SODIMM 3200 MT/s
+	       \vskip 8pt
+	    \end{minipage} \\\hline
+    Network Card &
+        \begin{minipage}{3.9cm}
+	       \vskip 8pt
+		      Realtek Semiconductor Co., LtdRTL8125 2.5GbE Controller
+	       \vskip 8pt
+	    \end{minipage} & 
+        \begin{minipage}{3.9cm}
+    	    \vskip 8pt
+    		   Realtek Semiconductor Co., LtdRTL8125 2.5GbE Controller
+    	    \vskip 8pt
+	    \end{minipage} & 
+        \begin{minipage}{3.9cm}
+          \vskip 8pt
+		      Realtek Semiconductor Co., LtdRTL8125 2.5GbE Controller
+	       \vskip 8pt
+	    \end{minipage} \\\hline\hline
+\textbf{Setup} & & & \\\hline
+    Operating System & Kubuntu 22.04 &  Ubuntu 22.04 & Ubuntu 22.04 \\\hline
+    Kernel &
+        \begin{minipage}{3.9cm}
+	       \vskip 8pt
+		      A
+	       \vskip 8pt
+	    \end{minipage} & 
+        \begin{minipage}{3.9cm}
+    	   \vskip 8pt
+    		   B
+    	   \vskip 8pt
+	    \end{minipage} & 
+        \begin{minipage}{3.9cm}
+	       \vskip 8pt
+		      C
+	       \vskip 8pt
+	    \end{minipage} \\\hline
+    Real-time Kernel &
+        \begin{minipage}{3.9cm}
+	       \vskip 8pt
+    		   A
+    	   \vskip 8pt
+	    \end{minipage} & 
+        \begin{minipage}{3.9cm}
+    	   \vskip 8pt
+    		   B
+    	   \vskip 8pt
+	    \end{minipage} & 
+        \begin{minipage}{3.9cm}
+    	   \vskip 8pt
+    		   C
+    	   \vskip 8pt
+	    \end{minipage} \\\hline
+    ROS version & Rolling & Rolling & Rolling \\\hline
+        \begin{minipage}{3cm}
+        \vskip 4pt
+    		   ros2\_control based on commit:\vskip 8pt
+	    \end{minipage} & 0eb319ea43b78b886a & 0eb319ea43b78b886a & 0eb319ea43b78b886a \\\hline
+            \begin{minipage}{3cm}
+        \vskip 4pt
+    		   ros2\_controllers based on commit:\vskip 8pt
+	    \end{minipage} & 05d7a5ec73a02eab2c & 05d7a5ec73a02eab2c & 05d7a5ec73a02eab2c \\\hline
+\end{tabular}
+    \caption{Three different computers were used for the evaluation. The table gives an overview of the used hardware, as well as the setup on each of the computers.}
+    \label{c3_tab_r2c_repos}
+\end{table}
 
-\missingfigure{Please add some figures}
-
-\subsubsection{KUKA KR 5}
-\missingfigure{Please add some figures}
-
-
-
-\subsection{Network}
-
-
-\subsection{Computer}
-
-
-
-
-\section{The Setup Used for Evaluation}
 Different middlewares:
 \begin{enumerate}
     \item Eclipse Cyclone DDS
@@ -36,7 +125,6 @@ Different Publishing types
     \item Publish trigger
     \item Publish type 
 \end{enumerate}
-\todoin{should probably test with different network workloads...}
 
 \begin{table}[]
 \begin{tabular}{cl|lll}
@@ -51,6 +139,12 @@ Different Publishing types
 \end{tabular}
 \end{table}
 
+\todoin{should probably test with different network workloads...}
+\subsection{Hardware}
+\paragraph{Robot Platforms}
+RSI used for communication with the robots
+\paragraph{Computer}
+\paragraph{Network}
 \section{test 1}
 \begin{figure}[htbp]
 	\centering
@@ -58,10 +152,15 @@ Different Publishing types
 	\caption{Schematic overview of the conceptual design of the system for the first test.}
 	\label{c6_fig_test_scenario_1}
 \end{figure}
+\section{test 2}
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=1\textwidth]{Figures/c6/test_scenario_2.drawio.pdf}
 	\caption{Schematic overview of the conceptual design of the system for the second test.}
 	\label{c6_fig_test_scenario_2}
 \end{figure}
+
+\section*{Site Note}
+Concept has also been tested on KUKA KR 16-2 KUKA KR 5 but because of how they are placed evaluation setup could not be conducted.
+\missingfigure{Please add some figures}
 

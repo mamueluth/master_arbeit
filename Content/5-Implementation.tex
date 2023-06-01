@@ -18,3 +18,112 @@ Creation of Hardware to run UDP server and creation of control node. Ignore cont
 
 \subsection{Adaption of Handles}
 
+\section{Controller Manager Hierachie}
+\subsection{Central Controller Manager}
+\subsubsection{Configuration of a Central Controller Manager}
+\lstset{language=yaml,basicstyle=\scriptsize}
+\begin{lstlisting}[caption=Example configuration of a central controller manager with a joint trajecotry controller.]
+controller_manager:
+  ros__parameters:
+    central_controller_manager: true
+    
+    position_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+position_trajectory_controller:
+  ros__parameters:
+    joints:
+      - /sub_1/sub_1_joint_a1
+      - /sub_1/sub_1_joint_a2
+      - /sub_1/sub_1_joint_a3
+      - /sub_1/sub_1_joint_a4
+      - /sub_1/sub_1_joint_a5
+      - /sub_1/sub_1_joint_a6
+      - /sub_2/sub_2_joint_a1
+      - /sub_2/sub_2_joint_a2
+      - /sub_2/sub_2_joint_a3
+      - /sub_2/sub_2_joint_a4
+      - /sub_2/sub_2_joint_a5
+      - /sub_2/sub_2_joint_a6
+
+    command_interfaces:
+      - position
+
+    state_interfaces:
+      - position
+    ... # Some configuration for JointTrajectoryController 
+\end{lstlisting}\label{c5_l_central_controller_manager_config}
+
+\subsubsection{Configuration of a Chained Central Controller Manager}
+\lstset{language=yaml,basicstyle=\scriptsize}
+\begin{lstlisting}[caption=Example configuration of a chained central controller manager.]
+controller_manager:
+  ros__parameters:
+    central_controller_manager: true
+
+    fpc_jtc_chain_controller:
+      type: forward_command_controller/ForwardCommandController
+
+fpc_jtc_chain_controller:
+  ros__parameters:
+    joints:
+      - /sub_1/position_trajectory_controller/sub_1_joint_a1
+      - /sub_1/position_trajectory_controller/sub_1_joint_a2
+      - /sub_1/position_trajectory_controller/sub_1_joint_a3
+      - /sub_1/position_trajectory_controller/sub_1_joint_a4
+      - /sub_1/position_trajectory_controller/sub_1_joint_a5
+      - /sub_1/position_trajectory_controller/sub_1_joint_a6
+      - /sub_2/position_trajectory_controller/sub_2_joint_a1
+      - /sub_2/position_trajectory_controller/sub_2_joint_a2
+      - /sub_2/position_trajectory_controller/sub_2_joint_a3
+      - /sub_2/position_trajectory_controller/sub_2_joint_a4
+      - /sub_2/position_trajectory_controller/sub_2_joint_a5
+      - /sub_2/position_trajectory_controller/sub_2_joint_a6
+    interface_name: position
+\end{lstlisting}\label{c5_l_chained_central_controller_manager_config}
+
+\subsection{Sub-Controller Manager}
+
+\subsection{Configuration of a Sub-Controller Manager}
+\lstset{language=yaml,basicstyle=\scriptsize}
+\begin{lstlisting}[caption=Example configuration of a sub-controller manager which exports all of it's command and state interfaces.]
+/sub_1/controller_manager:
+  ros__parameters:
+    update_rate: 10  # Hz
+    sub_controller_manager: true
+    distributed_interfaces_publish_period: 4 # ms
+\end{lstlisting}\label{c5_l_sub_controller_manager_config}
+\lstset{language=yaml,basicstyle=\scriptsize}
+
+\subsection{Configuration of a Chained Sub-Controller Manager}
+\begin{lstlisting}[caption=Example configuration of a chained sub-controller manager.]
+/sub_1/controller_manager:
+  ros__parameters:
+    update_rate: 10  # Hz
+    sub_controller_manager: true
+    distributed_interfaces_publish_period: 4
+    export_command_interfaces:
+      - ""  # don't export any command interfaces
+    export_state_interfaces:
+      - "" # don#t export any state intefaces
+
+    position_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+/sub_1/position_trajectory_controller:
+  ros__parameters:
+    joints:
+      - sub_1_joint_a1
+      - sub_1_joint_a2
+      - sub_1_joint_a3
+      - sub_1_joint_a4
+      - sub_1_joint_a5
+      - sub_1_joint_a6
+
+    command_interfaces:
+      - position
+
+    state_interfaces:
+      - position
+   ... # Some configuration for JointTrajectoryController 
+\end{lstlisting}\label{c5_l_chained_sub_controller_manager_config}

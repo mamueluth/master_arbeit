@@ -54,30 +54,30 @@ Product name & License & \gls{rmw} implementation & status  \\
 \hline
 \hline
 eProsima Fast DDS & Apache 2 & rmw\_fastrtps\_cpp & 
-    \begin{minipage}{4.5cm}
+    \begin{minipage}{4.2cm}
 	    \vskip 8pt
 		  Full support. \textbf{Default} \textbf{RMW}. Packaged with binary releases.
 	    \vskip 8pt
 	\end{minipage} \\\hline
  Eclipse Cyclone DDS & \begin{minipage}{2cm} \vskip 8pt Eclipse Public License v2.0 \vskip 8pt\end{minipage} & rmw\_cyclonedds\_cpp & 
-    \begin{minipage}{4.5cm}
+    \begin{minipage}{4.2cm}
 	   \vskip 8pt
       Full support. Packaged with binary releases.\newline\newline
 	   \vskip 8pt
 	\end{minipage} \\\hline
  RTI Connext DDS & \begin{minipage}{2cm} \vskip 8pt commercial, research \vskip 8pt\end{minipage} & rmw\_connext\_cpp & 
-    \begin{minipage}{4.5cm}
+    \begin{minipage}{4.2cm}
 	   \vskip 8pt
 		 Full support. Support included in binaries, but Connext installed separately.
 	   \vskip 8pt
 	\end{minipage} \\\hline\hline
-  Eclipse Zenoh & Apache 2 & $-$ & \begin{minipage}{4.5cm}
+  Eclipse Zenoh & Apache 2 & $-$ & \begin{minipage}{4.2cm}
 	 \vskip 8pt
 		 Via Zenoh bridge for DDS. DDS publisher/subscribers are mirrored and communication routed through Zenoh.
 	 \vskip 8pt
 	\end{minipage} \\\hline
 \end{tabular}
-    \caption{Overview of the repositories the \gls{r2c} framework includes.}
+    \caption{Overview of the different \glspl{rmw} used for comparison. To my best knowledge there is no official \gls{rmw} implementation for Eclipse Zenoh, but there exists a plugin, called \texttt{zenoh-plugin-dds}, which allows to route the \gls{dds} traffic through Zenoh.}
     \label{c3_tab_r2c_repos}
 \end{table}
 
@@ -96,7 +96,7 @@ Zenoh is a publisher, subscriber and query protocol by the Eclipse foundation.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   The ros2_control Framework  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{The \gls{r2c} Framework}\label{ros2_control}\todoImportant{shared-memory is missing}
+\section{The \gls{r2c} Framework}\label{ros2_control}
 The open-source framework \gls{r2c}, is a framework for real-time control, initially released for \gls{ros2} Foxy. It is a rewrite of \gls{rc}, with the goal to simplify integration of new hardware and overcome some drawbacks present in \gls{rc} \cite{noauthor_welcome_nodate, magyar_getting_started_with_ros2_control_2021, magyar_ros2_control_the_future_of_ros_control_2021}. As shown in table \ref{c3_tab_r2c_repos} the framework comprises multiple repositories. It includes core functionality like management of controllers and hardware, as well as implementations of commonly used controllers. Besides, it provides low-level tools for control theory and real-time control. \newline
 A more detailed view of the internals of the \gls{r2c} framework is presented in figure \ref{c3_fig_ros2_control_uml}. As can be seen, the framework includes a controller manager. The controller 
 \begin{table}[htbp]
@@ -142,14 +142,15 @@ Repository & Description  \\
 manager serves as entry-point for users and provides \gls{ros2} services through which the user can interact with the system. Additionally, it is responsible for managing the controllers and connects them to the abstracted hardware. The abstraction from the physical hardware and drivers is handled by the resource manager. The resource manager is part of the controller manager. Moreover, the resource manager stores and manages the hardware inside a resource storage. The hardware abstraction is done through interfaces (called \textit{hardware components}). These \textit{hardware components} can be divided into three groups:
 \begin{itemize}
     \item Actuator (\texttt{ActuatorInterface}): Robotic hardware like motors, valves, and other simple 1-\gls{dof} actuators.
-    \item Sensor (\texttt{SensorInterface}) Robotic hardware that can sens and measure physical properties of the environment.
+    \item Sensor (\texttt{SensorInterface}): Robotic hardware that can sens and measure physical properties of the environment.
     \item System (\texttt{SystemInterface}): Complex multi-\gls{dof} robotic hardware like an industrial robot.
 \end{itemize}
- Finally, there is a collection of controllers inside the \texttt{ros2\_controllers} repositories. Controllers are the units responsible fore calculating a system's input. The input is thereby calculated based on the measured error between a reference value and the system's output.\todoBetter{Add reference}\newline
+ Finally, there is a collection of controllers inside the \texttt{ros2\_controllers} repositories. Controllers are the units responsible fore calculating a system's input. The input is thereby calculated based on the measured error between a reference value and the system's output.\newline
  In conclusion, the framework can roughly be divided into two parts. The first part includes the controllers and the second part embraces the hardware. The controller manager connects those parts and serves as an entry-point for users to interact with the system.
 
 \subsection{The Link between Controllers and Hardware}\label{c3_sec_link_ctrl_hw}
-A very important concept to understand for this thesis are the \texttt{CommandInterface} and the \texttt{StateInterface}. As shown in figure \ref{c3_fig_ros2_control_uml} in the middle above, the \texttt{CommandInterface}\todoBetter{Fix} and \texttt{StateInterface} are located between the hardware site and the controller site of the \gls{r2c} framework. They abstract away from the hardware. The resource manager stores and manages them. \texttt{StateInterface} grands access to the state of the component, while \texttt{CommandInterface} additionally enables to write commands to a hardware component. If a controller wants to get access to the hardware, the resource manager creates so-called loans (\texttt{LoanedCommandInterface}/\texttt{LoanedStateInterface}). Those loaned interfaces are then passed to the controller. The controller can then read the state and write commands to the hardware via those loans.
+A very important concept to understand for this thesis are the \texttt{CommandInterface} and the \texttt{StateInterface}. As shown in figure \ref{c3_fig_ros2_control_uml} in the middle above, the \texttt{CommandInterface}\todoBetter{Fix} and \texttt{StateInterface} are located between the hardware site and the controller site of the \gls{r2c} framework. They abstract away from the hardware. The resource manager stores and manages them. \texttt{StateInterface} grands access to the state of the component, while \texttt{CommandInterface} additionally enables to write commands to a hardware component. If a controller wants to get access to the hardware, the resource manager creates so-called loans (\texttt{LoanedCommandInterface}/\texttt{LoanedStateInterface}). Those loaned interfaces are then passed to the controller. The controller can then read the state and write commands to the hardware via those loans.\newline
+This whole concept is based on a \gls{sm} architecture. The drivers of the hardware allocate memory where the values of the \texttt{CommandInterface} and \texttt{StateInterface} are stored. A pointer to the allocated memory is then passed to the control site of the framework via the \texttt{CommandInterface} and \texttt{StateInterface}.
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=1\textwidth]{Figures/c3/ros2_control_uml.png}

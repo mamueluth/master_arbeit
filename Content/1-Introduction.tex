@@ -16,13 +16,20 @@ This thesis concentrates solely on \gls{ros2} and especially on the question of 
 
 \section{Thesis Outline}
 \paragraph{\hyperref[sec:state_of_the_art]{Section 2: State of the Art}}
+
 \paragraph{\hyperref[sec:background]{Section 3: Background}}
 In the third chapter, an overview and introduction to frameworks and technologies this thesis relies on is given. First, \gls{ros} as well as its successor \gls{ros2} are introduced. Then a quick introduction to the \acrlong{dds} is given and a quick overview of different middlewares for \gls{ros2} are presented. Thereafter, the current state of the \gls{r2c} framework is presented and the most important concepts for this thesis are introduced, like hardware abstraction and chaining of controllers. Further, it is shown how in the current version of \gls{r2c}, based on \acrlong{sm}, multiple robots can be controlled and what the drawbacks and limitations are.
 \paragraph{\hyperref[sec:concept]{Section 4: Concept}}
-\paragraph{\hyperref[sec:implementation]{Section 5: Implementation}}
-\paragraph{\hyperref[sec:results]{Section 6: Results}}
-\paragraph{\hyperref[sec:conclusion_and_outlook]{Section 7: Conclusion and Outlook}}
+In the fourth chapter, the concepts that underlie this work are outlined. It is presented how this thesis is build on top of concepts from \gls{ros2} like \glspl{topic} and \glspl{service}. Further, the idea of how to integrate everything in the existing framework of \gls{r2c}.
 
+\paragraph{\hyperref[sec:implementation]{Section 5: Implementation}}
+In this chapter, the actual realization of the concept presented in chapter 4 is delineated. 
+\paragraph{\hyperref[sec:results]{Section 6: Results}}
+In chapter six, the results of the experimental evaluation are shown. In the first part, the experimental setup is described. It is explained on what hardware the experiments were conducted. This includes the computers for running the controllers as well as the used robot platform. The network and which \gls{dds} implementations are used is described as well. In addition, different parameters for \gls{dds} are used and compared. \newline
+Then the actual results are presented and discussed.\todo{Maybe small summery?}
+
+\paragraph{\hyperref[sec:conclusion_and_outlook]{Section 7: Conclusion and Outlook}}
+In the last chapter of this thesis, the presented concept as well as the actual implementation are discussed and based on the results are set into context.\todo{Maybe small summery?}
 
 % \todoin{Old has to be removed}
 % Roboter immer wichtiger, überall Roboter. \gls{ros2} de facto Standard. Steuerung und Regelung von Roboter ist Grundlage von all den Anwendungen, was nützt Roboter, wenn er sich nicht bewegt. Das \gls{r2c} Framework ist für Steuerung und Regelung in \gls{ros2} das Standard-Framework. Nur \gls{sm} Architektur. \todoAddin{Warum wollen wir verteilte Regelung?}

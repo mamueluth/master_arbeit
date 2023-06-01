@@ -57,6 +57,7 @@
 % for more sophisticated algorithm listings
 \usepackage{listings}
 
+% Define YAML language
 \lstset{
 language=C++,
 basicstyle=\small\ttfamily,
@@ -65,6 +66,19 @@ numbersep=5pt,
 xleftmargin=20pt,
 frame=tb,
 framexleftmargin=20pt
+}
+
+% Define YAML language
+\lstdefinelanguage{YAML}{
+  keywords={true,false,null,y,n},
+  keywordstyle=\color{darkgray}\bfseries,
+  sensitive=false,
+  comment=[l]{\#},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
 }
 % Make listings similar to algorithm environment
 \DeclareCaptionFormat{mylst}{\hrule#1#2#3}

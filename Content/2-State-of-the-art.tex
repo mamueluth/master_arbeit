@@ -1,12 +1,17 @@
 %% ==============================
 \chapter{\iflanguage{ngerman}{Stand der Wissenschaft und Technik}{State of the Art}}
 \label{sec:state_of_the_art}
+\todoin{Some very short introduction and so on here}
+\section{Control Over Network in \gls{ros2}}
 Gutiérrez et al. showed in their paper that with \gls{ros2} version Ardent, initially released in December 2017, it became feasible to do soft real-time robotics over the network \cite{gutierrez_towards_2018}. The study evaluated the communication capabilities of \gls{ros2} in a scenario
 \begin{wrapfigure}{r}{7cm}
 \includegraphics[width=7cm]{Figures/c2/Gutiérrez_toward_distributed_and_real-time.png}
 \caption{The experimental setup used by Gutiérrez et al. to evaluate the real-time performance of \gls{ros2} communication over Ethernet. Figure taken from \cite{gutierrez_towards_2018}.} \label{c2_fig_gutierrez_experimental_seutp}
 \end{wrapfigure}
 for communication between robot components under Linux. By measuring worst-case latencies and missed deadlines, the authors analyzed the impact of computation and network congestion on communication latencies. The experimental setup can be seen in figure \ref{c2_fig_gutierrez_experimental_seutp} and consisted of an embedded device and a Linux PC. They then measured the round-trip time between the embedded device and the Linux PC. This was done with different DDS middleware implementations. With their results, they showed that configuring the \gls{ros2} framework and DDS threads significantly reduced jitter and worst-case latencies. However, in their work they also highlighted the limitations of the Linux network stack, especially for non-critical traffic. Using Linux traffic control \gls{qos} methods, those limitations could be minimized. They concluded that soft real-time communication over Ethernet to be possible, but not hard real-time \cite{gutierrez_towards_2018}. \newline
+Puck et al. concluded in further investigations on the subject that in time-synchronized systems using the \gls{ptp} the performance could be improved. However, the Linux network stack continued to introduce non-deterministic latencies and jitter \cite{puck_distributed_2020}. They were then even able to show that, under certain conditions, hard real-time requirements can be met up to frequencies of 1kHz. This was only achievable with the correct system configuration \cite{puck_performance_2021}.\newline
+Plasberg et al. did their research on a distributed and time-synchronized setup consisting of two real-time capable Linux PC. They connected the Linux PCs via Ethernet for communication and a separate network for the time-synchronization with \gls{ptp}. They then conducted cyclic latency tests. As a result, Plasberg et al. concluded their setup to be capable of controlling robots in a distributed system, like industrial robot arms or mobile platforms \cite{plasberg_towards_2022}.
+\section{Distributed Control of Multiple Robots}
 
 \todoin{Old has to be removed}
 Keine Ahnung lauter bla bla bla das in die cloud verlegt werden soll der neue große trend aber weiß nicht ob das so wirklich passt "Edge robotics: are we ready? an experimental evaluation of current vision and future directions" \cite{groshev_edge_2023} \newline
