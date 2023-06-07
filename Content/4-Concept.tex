@@ -3,81 +3,171 @@
 \label{sec:concept}
 %% ==============================
 
-\section{Conceptual Design}
+\section{Problem Statement and Goals}\todo{maybe create new chapter?}
+As described in section \ref{c3_sec_link_ctrl_hw} the current design of \gls{r2c} is built around a \gls{sm} architecture. As a result, the control of multiple robots is only possible in two ways: 
+\begin{enumerate}
+    \item On one machine with a tight synchronization. 
+    \item On multiple machines with no significant synchronization at all.
+\end{enumerate}
+This has been elaborated in \ref{c3_sec_controlling_multiple_robots} in more detail. \gls{ros2} and \gls{r2c} are developed with the goal of transferring the success of \gls{ros} to the industrial domain, where control of multiple robots is common. The \gls{sm} approach, is focused on using on computer to run the complete control stack and is thereby limited in its scalability. The main goal of this work is therefor to  test whether it is possible in the context of \gls{r2c} to run multiple controllers on multiple machines and exchange messages over \gls{dds} in a real-time like manner. This should allow a tight synchronization while unitizing multiple machines.\newline
+The goal can be divided into several subordinate objectives. One is the development of a general concept for network-based communication, which fits into the \gls{r2c} framework without having to change the already existing controllers and robot drivers. On the other hand, several different control architectures shall be supported. Different architectures that should be supported are for example :
+\paragraph{Distributed Drivers:}
+ Distributing of controllers and drivers on different machines. Meaning, it should be possible to have for example the controller running on one computer while the drivers for communication with the hardware are running on different computers. This allows to control multiple robots with one central controller while the communication is handled by another device.
+\paragraph{Decentralized Control:}
+A central machine with a higher-level controller and distributed low-level controllers on separate machines. An example for this could be a central differential drive controller on one machines and multiple PID controllers together with the drivers on multiple separate machines, for the low-level control. 
+
+
+\section{Concept Overview}
+In order to achieve the previously mentioned goals, a conceptual design composed of one central and multiple sub-controller managers is proposed. A schematic overview of the proposed concept is given in figure \ref{c4_fig_concept_overview} and discussed in the fol following. It should be noted that both the central controller manager and the sub-controller managers may well manage multiple systems. For the sake of simplicity, we will focus on the case where each sub-controller manager manages exactly one system. The central controller manager does not manage a system in this example. Moreover, in our case, the system represents a robot. One should also note, that instead of being a system, it could also be an actuator or sensor.\newline
+As shown in the schematic representation \ref{c4_fig_concept_overview}, each of the controller manager runs on its own machine. The central controller manager thereby acts as a coordinating entity, while the sub-controller managers are responsible for managing individual systems within the overall architecture.\newline
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=1\textwidth]{Figures/C4/distributed_control_with_driver.pdf}
+	\caption{Schematic overview of the concept implemented. The figure shows, how a more complex system of multiple robots, controlled by multiple controllers on different machines, could be realized. }
+	\label{c4_fig_concept_overview}
+\end{figure}
+\paragraph{Central Controller Manager}
+The central controller manager provides services that allow sub-controller managers to register themselves with the central controller manager. The sub-controller managers then export their \glspl{ci} and \glspl{si} and create special distributed versions of them. This is indicated by the yellow dotted line inside each sub-controller manager. Those are then registered with the service call provided by the central controller manager. This is shown with the red line in the picture. With this registration service, the necessary communication between the central controller manager and the sub-controller managers are established. This way, the central controller manager facilitates the integration of multiple sub-controller managers into the system.\newline
+The central controller manager can then claim the \glspl{ci} and \glspl{si}. By claiming these interfaces, the central controller manager gains access to the \glspl{ci} and \glspl{si} of the sub-controller managers' systems and can read the state and issue commands over the network as needed. This allows to run the drivers for the robots inside the sub-controller managers while the controller is running in the central controller manager on a different machine. A more detailed explanation of the necessary steps to realize this is given in section \ref{c4_sec_registraion_csi}\newline
+Alternatively, the central controller manager provides a service call for registration of \glspl{ri}. These \glspl{ri} enable the central controller manager to establish a direct connections and coordination between the controllers run by the central controller manager and controller run by sub-controller. This approach allows for chaining of controllers run on different machines.\newline
+Unlike the sub-controller managers, the central controller manager does not require to manage a system of its own to fulfill a useful purpose. Theoretically, a sub-controller manager could also not manage an actuator, sensor or system, but would then have no real use. In the schematic overview, this fact is illustrated with the central controller manager not having a system. The main task of the central controller manager is to coordinate and control the subordinate controller managers and their respective systems. By providing registration services, claiming interfaces, and using \glspl{ri}, the central controller manager effectively manages overall system behavior and ensures proper coordination among the sub-controller managers.
+\paragraph{Sub-Controller Manager}
+The sub-controller manager on the other hand is responsible for managing an individual system within the overall architecture. This is illustrated in figure \ref{c4_fig_concept_overview} by the fact that each of the sub-controllers $i$ contains a corresponding system $i$. For each pair of system $i$ and system $j$, where $i\neq j$, system $i$ and system $j$ are different. \newline
+Additionally, the drivers for communicating with the real hardware are then run within the context of the sub-controller managers. This means they handle low-level hardware interactions and controllers for higher-level control functionalities.\newline
+The sub-controller managers can be configured in two ways: they can have only a driver running, or they can have both a driver and controllers running. This flexibility allows for different system setups and configurations, depending on the specific requirements of each sub-controller manager's system.
+\paragraph{Limitations}
+Importantly, no direct chaining of sub-controller managers is allowed in this system. Coordination and communication occurs exclusively between the central controller manager and each sub-controller manager. The central controller manager acts as the central point of control and coordination, orchestrating the actions of the sub-controller managers based on the state information and commands received.
+
+In summary, the envisioned system architecture consists of a central controller manager and multiple sub-controller managers. The central controller manager provides registration services, can directly claim \glspl{ci} and \glspl{si} from the sub-controller managers, or utilize \glspl{ri} for chaining. The sub-controller managers can have either only drivers or both drivers and controllers running. Controllers can be chained inside a sub-controller manager or between sub-controller manager and central controller manager. Controller chaining inside the central controller manager is possible as well, but not between sub-controller managers.
+
+
+\section{Integration in \gls{r2c}}
+\subsection{New Types of \gls{ci} and \gls{si}}
+As shown in the UML class diagram in graphic \ref{c3_fig_ros2_control_uml} the link between the hardware site and the controllers in the \gls{r2c} framework are the \glspl{ci} and \glspl{si}. See section \ref{c3_sec_link_ctrl_hw} for a more detailed explanation of the conceptual background. \newline
+The fundamental idea of the design is to split the system at this point. We then introduce new distributed types of \gls{ci} and \gls{si}. Those new distributed types of handles have the same interfaces as the normal \glspl{ci} and \glspl{si} 
 \begin{figure}[htbp]
 	\centering
     \includegraphics[width=1\textwidth]{Figures/C4/simple_concept.drawio.pdf}
 	\caption{Schematic overview commands and states from one machine to another are transferred using topics and nodes from \gls{ros2}. The infrastructure provided by \gls{ros2} is thereby emphasized in red.}
 	\label{c4_fig_simple_concept}
 \end{figure}
+but internally they have a \gls{ros2} node and create publisher and subscribers. This is shown in figure \ref{c4_fig_simple_concept}. As can be seen, the new types of \glspl{ci} and \glspl{si} are stored inside the \textit{ResourceStorage} as normal \glspl{ci} and \glspl{si} would be, but they publish/receive their commands/state via \gls{ros2} topics. The information about the created publishers and subscribers is then made available with the registration of a sub-controller manager at the central controller manager. This is explained in more detail in the following sections.
 
-\section{Integration in \gls{r2c}}
-As described in section \ref{c3_sec_link_ctrl_hw} the current design of \gls{r2c} is built around a \gls{sm} architecture. As a result the control of multiple robots is only possible in two ways: 
+\subsection{Conceptual Registration of a Sub-Controller Manager}\label{c4_sec_registraion_csi}
+The registration of a sub-controller manager at a central controller manager involves a series of steps and actions. Those actions are performed by both the sub-controller manager and the central controller manager. This is needed in order to establish the before mentioned connection between the distributed \glspl{ci} and \gls{si} of the central controller managers and the sub-controller manager.
+
+First, the conceptual steps the central controller manager needs to do in order to establish connection are explained:
 \begin{enumerate}
-    \item On one machine with a tight synchronization. 
-    \item On multiple machines with no significant synchronization at all.
-\end{enumerate}
-This has been elaborated in \ref{c3_sec_controlling_multiple_robots} in more detail. The goal of this work is to test whether it is possible in the context of \gls{r2c} to run multiple controllers on multiple machines and still allow tight synchronization.\newline
-As shown in the UML class diagram in graphic \ref{c3_fig_ros2_control_uml} the link between the hardware site and the controllers in the \gls{r2c} framework are the \texttt{CommandInterfaces} and the \texttt{StateInterfaces}. See section \ref{c3_sec_link_ctrl_hw} for a more detailed explanation of the conceptual background. \newline
-The fundamental idea of the design is to split the system at this point and allow multiple controller managers to coexist. The controller managers are thereby divided into two groups. The first group consisting of exactly one central controller manager and a second group composed of possibly multiple sub controller managers.
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=1\textwidth]{Figures/C4/distributed_control.drawio.pdf}
-	\caption{Schematic overview of the concept implemented. The figure shows, how a more complex system of multiple robots, controlled by multiple controllers on different machines, could be realized. }
-	\label{c4_fig_concept_overview}
-\end{figure}
-\subsection{Central Controller Manager}
-\begin{itemize}
-    \item \textbf{Subcontroller manager:}
-    \begin{itemize}
-        \item register subcontroller manager $\implies$ export descriptions of Command-/SystemInterfaces
-        \item create publisher for Command-/StateInterfaces
-        \item wait for registration to successfully complete
-        \item subscribe to commandpublisher received from central controller manager
-    \end{itemize}
-    \item \textbf{Central Controller manager:}
-    \begin{itemize}
-        \item create service for registration
-        \item register subcontroller manger if receive call
-        \item subscribe to publisher of Command-/StateInteface of subcontrolelr manager
-        \item create special Command-/StateInterfaces for this
-        \item create publisher for Commands
-        \item proceed as normal
-    \end{itemize}
-\end{itemize}
-\subsection{Controller Chaining}
-\begin{itemize}
-    \item \textbf{Subcontroller manager:}
-    \begin{itemize}
-        \item same as for simple case
-        \item export additionally reference interfaces
-    \end{itemize}
-    \item \textbf{Central Controller manager:}
-    \begin{itemize}
-        \item same as simple case
-        \item import reference interfaces
-        \item create chained controller
-        \item proceed as normal
-    \end{itemize}
-\end{itemize}
+    \item Create a service for registration. The central controller manager creates a service that allows sub-controller managers to initiate the registration process. This service acts as an interface for receiving registration requests. The request should thereby have the name and namespace of the sub-controller manager, as well as the names of the topics created by the distributed \glspl{ci} and \glspl{si}. 
 
-\begin{itemize}
-    \item \textbf{Conceptual Design:}
-    \begin{itemize}
-        \item split at the handles
-        \item have central- and subcontrollermanagers
-        \item use topics to publish data
-    \end{itemize}
-    \item \textbf{Integration into \gls{r2c}}
-    \item Separated drivers:
-    \begin{itemize}
-        \item registration
-        \item creation of topics
-    \end{itemize}
-        \item Controller Chaining:
-    \begin{itemize}
-        \item registration
-        \item creation of topics
-        \item activation of chain
-    \end{itemize}
-\end{itemize}
+    \item Register sub-controller manager upon receiving a registration call. When a registration call is received, the central controller manager should then create a special wrapper object for sub-controller manager and store the corresponding information. This involves e.g. adding the sub-controller manager to its list of managed components.
+
+    \item Create the counterparts of the distributed \glspl{ci} and \glspl{si} of the sub-controller manager. These counterparts should then subscribe to publishers of the distributed \glspl{ci} and \glspl{si} of the sub-controller manager. After a successful subscription and creation of those counterparts, they are stored inside the central controller manager's \textit{ResourceManager} as \glspl{ci} and \glspl{si}. This allows the central controller manager to receive updates about the commands and state information from the sub-controller manager. At the same time, those \glspl{ci} and \glspl{si} can then be claimed by controllers of the central controller manager.
+
+    \item As a next step, the central controller manager needs to create publishers for the received \glspl{ci}. This is needed to send commands to the sub-controller managers' \glspl{ci}. As \glspl{si} are only unidirectional, nothing needs to be done here. 
+    
+    \item The last step is then to send the topic names of those created publishers back to the sub-controller manager. This is done with the response of the provided service. 
+
+    \item From here on, the central controller manager can then proceed as normal. All the necessary connections are established. If the \glspl{ci} and \gls{si} are then claimed within the central controller manager, nothing special needs to be done, since the interface stays the same. The controller claiming the handles is not aware that the data received by the \glspl{si} is in fact send over the network. The same is for commands issued by the controller. The controller can then write its command to the \glspl{ci} and the sending over the network is handled internally.
+\end{enumerate}
+
+On the other hand, the sub-controller manager needs to perform the following tasks during the registration process:
+\begin{enumerate}
+    \item For each of the available \glspl{ci} and \glspl{si} create the distributed \glspl{ci} and \glspl{si}. Those are then stored in the \textit{ResourceStorage} as they normally would be. The distributed \glspl{ci} and \glspl{si} are internally creating publishers and the names of those topics are then stored. 
+
+    \item The sub-controller manager needs then to register at the central controller manager. In the registration call, the namespace, name as well as the names of the topics of the \glspl{ci} and \glspl{si} are included. 
+    
+    \item Wait for registration to successfully complete. 
+    
+    \item With the response, the sub-controller manager receives the names of the topics for the central controller managers distributed \glspl{ci}. The sub-controller manager needs then to update its distributed \glspl{ci}, so that they subscribe to the topics of the central controller managers distributed \gls{ci}. This allows the sub-controller manager to receive commands from the central controller manager and act upon them accordingly.
+
+    \item Once all the necessary connections and subscriptions are established, the sub-controller manager can operate normally. On the driver site of the \gls{r2c} framework, is no change needed this way. A driver exports its \glspl{ci} and \glspl{si} as it would normally. The creation of the topics and the handling of the subscription is done in the sub-controller manager internally. A driver can read the commands from the \gls{ci} as normal and does not know or need to know, that the command was received over the network.
+    
+\end{enumerate}
+Overall, the described conceptual registration process between the sub-controller manager and the central controller manager in involves establishing connections via a service calls, creating of publishers and subscribers, and ensuring communication between the components this way. This is all done while the already existing controllers and drivers of the framework can stay the same and don't need to be updated.
+
+\subsection{Distributed Controller Chaining}
+Our second sub goal regarding decentralized control includes the necessity to chain the input of a sub-controller manager's controller to the output of a controller run on a different machine. In order to make it possible to chain controllers of a sub-controller manager and a central controller manager, a few steps have to be done. The conceptual procedure of how to chain the controller in a distributed manner over the network are described in the following.
+
+First, the steps and actions which the central controller manager needs to perform are presented:
+\begin{enumerate}
+    \item Create a service for registration. The central controller manager creates a service that allows sub-controller managers to register its distributed \glspl{ri}. The request should thereby have the name and namespace of the sub-controller manager, as well as the names of the topics created \glspl{ri}.
+        
+    \item Upon receiving a request from a sub-controller manager to register, it's \glspl{ri} the central controller manager checks its stored components for the sub-controller manager. The central controller manager then imports the \glspl{ri} provided by the sub-controller managers. It then creates, distributed \glspl{ci}. In a first step, the \glspl{ci} subscribes to the topics provided by the \glspl{ri}. In a second step, the distributed \glspl{ci} need to create topics themselves.
+    
+    \item Next, create the response for the service call and add the topic names for the created distributed \gls{ci} to it. The response is then sent back to the sub-controller manager.
+    
+    \item  Once the \glspl{ri} are imported and the distributed \glspl{ci} are created, the central controller manager can continue its regular operations. A controller of the central controller manager can then claim those \glspl{ci} and commands to them, which are then sent over the network to the \glspl{ri} of the sub-controller managers controllers.
+\end{enumerate}
+On the other hand, the sub-controller manager performs the following tasks to facilitate the chaining of controllers:
+\begin{enumerate}
+    \item The sub-controller manager controllers are set in chaining mode. The controller no longer receives its input from subscriptions or services. It creates \glspl{ci} which in the context of chained controllers are called \glspl{ri}. Those \glspl{ri} are then exported and added to the \textit{ResourceStorage} of the sub-controller manager.
+
+    \item The sub-controller manager then claims the \glspl{ri} and creates distributed \glspl{ci} versions of them. The distributed \glspl{ci} create topics, as in the other cases, where they publish their stored value to.
+        
+    \item In a next step, the sub-controller manager initiates the registration process by calling the central controller manager's service. Beside the namespace and name, the topic names of the \glspl{ri} are added to the request.
+
+    \item Upon successful registration, the sub-controller manager receives the topic names of the central controller managers distributed \glspl{ci} for the \glspl{ri}. The \glspl{ci} of the \glspl{ri} are then subscribed to those topics.
+
+    \item The registration procedure is now complete. Now a connection between the controllers of the central controller managers and the controller of the sub-controller manager is established. The sub-controller manager can proceed with its normal operation.
+
+\end{enumerate}
+In summary, the conceptual registration process and chaining of controllers between the sub-controller manager and the central controller manager involves registration of the \glspl{ri} of the sub-controller manager. Further, a connection between the output of the central controller managers controller and the input of the sub-controller managers controller is established. This allows for chaining of controllers running on different machines. Moreover, with the proposed way, the controllers as well as the process for chaining and exporting \glspl{ri} can stay the same and no changes need to be done.
+\missingfigure{vllt ablauf diagram für registraion}
+\missingfigure{vllt ablauf diagramm für reference.}
+% \subsection{Old remove}
+% \paragraph{Concept}
+% \begin{itemize}
+%     \item \textbf{Conceptual Design:}
+%     \begin{itemize}
+%         \item split at the handles - done
+%         \item have central- and subcontrollermanagers - done 
+%         \item use topics to publish data -done
+%     \end{itemize}
+%     \item \textbf{Integration into \gls{r2c}}
+%     \item Separated drivers:
+%     \begin{itemize}
+%         \item registration - done 
+%         \item creation of topics - done 
+%     \end{itemize}
+%         \item Controller Chaining:
+%     \begin{itemize}
+%         \item registration
+%         \item creation of topics - done 
+%         \item activation of chain - done 
+%     \end{itemize}
+% \end{itemize}
+% \paragraph{registraiont for controllers}
+% \begin{itemize}
+%     \item \textbf{Subcontroller manager:}
+%     \begin{itemize}
+%         \item register subcontroller manager $\implies$ export descriptions of Command-/SystemInterfaces
+%         \item create publisher for Command-/\glspl{si}
+%         \item wait for registration to successfully complete
+%         \item subscribe to commandpublisher received from central controller manager
+%     \end{itemize}
+%     \item \textbf{Central Controller manager:}
+%     \begin{itemize}
+%         \item create service for registration
+%         \item register subcontroller manger if receive call
+%         \item subscribe to publisher of Command-/StateInteface of subcontrolelr manager
+%         \item create special Command-/\glspl{si} for this
+%         \item create publisher for Commands
+%         \item proceed as normal
+%     \end{itemize}
+% \end{itemize}
+% \paragraph{Controller Chaining}
+% \begin{itemize}
+%     \item \textbf{Subcontroller manager:}
+%     \begin{itemize}
+%         \item same as for simple case
+%         \item export additionally \glspl{ri}
+%     \end{itemize}
+%     \item \textbf{Central Controller manager:}
+%     \begin{itemize}
+%         \item same as simple case
+%         \item import \glspl{ri}
+%         \item create chained controller
+%         \item proceed as normal
+%     \end{itemize}
+% \end{itemize}

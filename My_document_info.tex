@@ -99,14 +99,18 @@
 \newacronym{rcl}{rcl}{\gls{ros} Client Library}
 \newacronym{rclcpp}{rclcpp}{\gls{ros} Client Library C++}
 \newacronym{rclpy}{rclpy}{\gls{ros} Client Library Python}
+\newacronym{rmw}{rmw}{\gls{ros} middleware}
 \newacronym{ros}{ROS}{Robot Operating System}
 \newacronym{ros2}{ROS 2}{Robot Operating System 2}
 \newacronym{rsi}{RSI}{RobotSensorInterface}
-\newacronym{rmw}{rmw}{\gls{ros} middleware}
-\newacronym{sm}{sm}{shared-memory}
 %% --------------------
 %% |     Glossary     |
 %% --------------------
+\newglossaryentry{ci}
+{
+    name={\textit{CommandInterface}},
+    description={}
+}
 \newglossaryentry{ddsg}
 {
     name={\gls{dds}},
@@ -140,6 +144,11 @@
     name={\textit{ros\_control}},
     description={Framework for robot control in \gls{ros}}
 }
+\newglossaryentry{ri}
+{
+    name={\textit{ReferenceInterface}},
+    description={}
+}
 \newglossaryentry{rosg}
 {
     name={\gls{ros}},
@@ -166,10 +175,15 @@
     description={A service is a communication mechanism in \gls{ros} and \gls{ros2} that allows \glspl{node} to request and receive a response in a client-server pattern},
     plural={\textit{services}}
 }
-\newglossaryentry{smg}
+\newglossaryentry{si}
 {
-    name={\gls{sm}},
-    description={\acrlong{sm}}
+    name={\textit{StateInterface}},
+    description={}
+}
+\newglossaryentry{sm}
+{
+    name={shared-memory},
+    description={Shared-memory architecture is a concept that allows multiple processors or threads to access a common physical memory. Data can then be exchanged over the common memory. }
 }
 \newglossaryentry{topic}
 {

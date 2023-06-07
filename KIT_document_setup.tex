@@ -21,7 +21,8 @@
 
 % numbers option provides compact numerical references in the text.
 \usepackage[numbers]{natbib}
-
+\usepackage{hyphenat}
+\usepackage{seqsplit}
 %% -------------------------------
 %% | Graphics, Figures, Tables   |
 %% -------------------------------
@@ -136,7 +137,6 @@ framexleftmargin=20pt
 % Hyperref should be the last package loaded
 \usepackage[hyphens]{url}
 \usepackage[breaklinks,colorlinks=true,pdftex,pageanchor=false]{hyperref}
-
 
 % My Todo commands
 \newcommand{\todoin}[1]{\todo[inline]{#1}}
