@@ -45,14 +45,14 @@ Some of the key features of \gls{dds} are listed below:\todo{rewrite!!!!}
 
 \end{itemize}
 \subsection{DDS Vendors and Implementations}
-For \gls{dds} exist a huge variety of different vendors and implementations. In table \ref{c3_tab_overview_rmw} an overview of different \gls{dds} implementations used as \gls{rmw} is given.
+For \gls{dds} exist a variety of different vendors and implementations. In table \ref{c3_tab_overview_rmw} an overview of a few different \gls{dds} implementations used as \gls{rmw} is given.
 \subsubsection*{Fast \gls{dds}}
 Fast \gls{dds} by eProsima is the default \gls{rmw} used since \gls{ros2} Foxy. It is at the time of writing still used as the default \gls{rmw} for \gls{ros2} Rolling. As the default \gls{rmw} it is fully supported and deployed under an Apache 2 license together with the binary releases. 
-\subsubsection*{Cyclon \gls{dds}}
+\subsubsection*{Cyclon \gls{dds}}\todo{Write}
 Cyclon \gls{dds} is an implementation of the 
-\subsubsection*{Connext \gls{dds}}
+\subsubsection*{Connext \gls{dds}}\todo{Write}
 Connext \gls{dds} is an implementation of the 
-\subsubsection*{Zenoh}
+\subsubsection*{Zenoh}\todo{Write}
 Zenoh is a publisher, subscriber and query protocol by the Eclipse foundation.
 \href{https://www.adlinktech.com/en/Zenoh}{Zenoh} 
 \href{https://zenoh.io/blog/2021-03-23-discovery/}{Zenoh advatages} 
@@ -156,34 +156,18 @@ manager serves as entry-point for users and provides \gls{ros2} services through
  In conclusion, the framework can roughly be divided into two parts. The first part includes the controllers and the second part embraces the hardware. The controller manager connects those parts and serves as an entry-point for users to interact with the system.
 
 \subsection{The Link between Controllers and Hardware}\label{c3_sec_link_ctrl_hw}
-A very important concept to understand for this thesis are the \gls{ci} and the \gls{si}. As shown in figure \ref{c3_fig_ros2_control_uml} in the middle above, the \gls{ci} and \gls{si} are located between the hardware site and the controller site of the \gls{r2c} framework. They abstract away from the hardware. The resource manager stores and manages them. \gls{si} grands access to the state of the component, while \gls{ci} additionally enables to write commands to a hardware component. If a controller wants to get access to the hardware, the resource manager creates so-called loans (\textit{LoanedCommandInterface} or \textit{LoanedStateInterface}). Those loaned interfaces are then passed to the controller. The controller can then read the state and write commands to the hardware via those loans.\newline
-This whole concept is based on a \gls{sm} architecture. The drivers of the hardware allocate memory where the values of the \gls{ci} and \gls{si} are stored. A pointer to the allocated memory is then passed to the control site of the framework via the \gls{ci} and \gls{si}.
+A very important concept to understand for this thesis are the \gls{ci} and the \gls{si}, which are often called \glspl{handle}. As shown in figure \ref{c3_fig_ros2_control_uml} in the middle above, the \gls{ci} and \gls{si} are located between the hardware site and the controller site of the \gls{r2c} framework. They abstract away from the hardware. The hardware then creates the \glspl{handle} and exports them. The resource manager imports the exported \glspl{ci} and \glspl{si}. They are then stored inside the resource storage and the resource manager manages them. \gls{si} grands access to the state of the component, while \gls{ci} additionally enables to write commands to a hardware component. If a controller wants to get access to the hardware, the resource manager creates so-called loans (\textit{LoanedCommandInterface} or \textit{LoanedStateInterface}). Those loaned interfaces are then passed to the controller. The controller can then read the state and write commands to the hardware via those loans.\newline
+This whole concept is based on a \gls{sm} architecture. The drivers of the hardware allocate memory where the values of the \gls{ci} and \gls{si} are stored. A pointer to the allocated memory is then passed to the control site of the framework via the \gls{ci} and \gls{si}. 
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=1\textwidth]{Figures/c3/ros2_control_uml.png}
-	\caption{UML diagram of the most important classes and interfaces in the \gls{r2c} framework. Picture taken from \cite{noauthor_welcome_nodate}. }
+	\caption{UML diagram of the most important classes and interfaces in the \gls{r2c} framework. The \glspl{ci} and \glspl{ci}, so called \glspl{handle}, are of special significance for this thesis. Picture taken from \cite{noauthor_welcome_nodate}. }
 	\label{c3_fig_ros2_control_uml}
 \end{figure}
  
 \subsection{Controller Chaining}
 Controller chaining in \gls{r2c} describes the possibility to link the output of one controller to the input of another. The chaining can thereby be in sequence (cascade control) or in parallel.\newline
-For a controller to be able to be chained, it has to derive from the \textit{\seqsplit{ChainableController-Interface}}\todoBetter{Fix} instead of the \textit{ControllerInterface}. The chainable controller must then export reference interfaces. Those reference interfaces have the same meaning as the \textit{CommandInterfaces}. The controller can then run in either chained or external mode, where the latter is equivalent to a non chainable controller. If the controller runs in chained mode, all external interfaces like subscriber and services are disabled. This is done in order to avoid concurrency in the input commands. Another controller can then claim the reference interfaces and chain its output to the input of the chainable controller.
-%  The control loop can be consist of three steps:
-% \lstset{language=C++,basicstyle=\scriptsize}
-% \begin{lstlisting}[caption=Pseudo code for the control loop.]
-% // creat controller manager with an rclcpp::executor
-% auto cm = 
-%     std::make_shared<controller_manager::ControllerManager>(executor, cm_node_name);
-% while (rclcpp::ok())
-% {   
-%     // calculated meassured_period
-%     // execute update loop
-%     cm->read(cm->now(), measured_period);
-%     cm->update(cm->now(), measured_period);
-%     cm->write(cm->now(), measured_period);
-%     //sleep until next iteration
-% }
-% \end{lstlisting}\label{c3_code_control_loop}
+For a controller to be able to be chained, it has to derive from the \textit{\seqsplit{ChainableController-Interface}} instead of the \textit{ControllerInterface}. The chainable controller must then export reference interfaces. Those reference interfaces have the same meaning as the \textit{CommandInterfaces}. The controller can then run in either chained or external mode, where the latter is equivalent to a non chainable controller. If the controller runs in chained mode, all external interfaces like subscriber and services are disabled. This is done in order to avoid concurrency in the input commands. Another controller can then claim the reference interfaces and chain its output to the input of the chainable controller.
 
 \subsection{Controlling Multiple Robots with \gls{r2c}}\label{c3_sec_controlling_multiple_robots}
 In the current state, \gls{r2c} focuses on controlling a single robot or robot cell. Further, the focus thereby lies on using a single computer to run the whole control stack. This includes the drivers used for communication with the hardware, the controller manager and controllers.\newline
@@ -195,7 +179,7 @@ Controlling multiple robots is however possible. Depending on the task, control 
 
 \paragraph{Scenario 1:} 
 In the first scenario, where a tight synchronization between the robots is needed, the most feasible way is to create on controller manager and multiple systems. One system for each robot. Each system can then be controlled by its own controller architecture. The controllers of those architectures are in turn managed by on controller manager. This controller manager can then handle the synchronization between the different systems.\newline
-One should note, that this approach is limited to one machine. In the current form of \gls{r2c} there is no way to communicate between multiple controller managers. An outline of the architecture is given in representaion \ref{c3_fig_r2c_mr_ts}.
+One should note, that this approach is limited to one machine. In the current form of \gls{r2c} there is no way to communicate between multiple controller managers. An outline of the architecture is given in representation \ref{c3_fig_r2c_mr_ts}.
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=1\textwidth]{Figures/c3/multiple_robots_one_system_current-Page-1.pdf}
@@ -221,11 +205,17 @@ In this case, however, the systems are completely independent of each other. Thi
 % What's the difference?????
 % \section{Time Sensitive Networks}
 
-\section{The Used Hardware}
-\section{Computers}
-Network card : lshw command
-cpu : lscpu
-memory: sudo dmidecode --type 17
+\section{The Used Hardware}\todo{Add network?}
+The evaluation is done on real hardware. For the evaluation, multiple computers as well as multiple robots are used. In the following, a short overview of the computers and robots is given.
+\subsection{Computers}
+It was no specially for control or real-time tasks designed hardware used. The used computers are three off the shelf laptops. A detailed overview of the exact hardware specifications of the laptops used is shown in Table \ref{c3_tab_pc_overview}. It includes the processor and network card of the laptops, as well as the size of the RAM and what type of RAM was used. The first computer (PC1) is a Tuxedo Polaris AMD Gen3. The second one (PC2) a Lenovo Legion 5 15ACH6H and the third computer (PC3) a Lenovo Legion 5 Pro 16ARH7H.\newline
+The setup on the laptops itself was on each the same. A fresh Kubuntu 22.04 was installed. The real-time Kernel was installed via the Ubuntu \texttt{pro} command. As \gls{ros2} distro Rolling was chosen and the basis for the changes of the \gls{r2c} and \textit{ros2\_controllers} repositories is listed in table \ref{c3_tab_pc_overview}.
+% Network card : lshw command
+% cpu : lscpu
+% memory: sudo dmidecode --type 17
+% 1 -> arbeitslaptop
+% 2 -> mein laptop
+% 3 -> yaxin laptop
 
 \begin{table}[htbp]
     \centering
@@ -245,12 +235,12 @@ memory: sudo dmidecode --type 17
 	    \end{minipage} & 
         \begin{minipage}{3.7cm}
     	    \vskip 8pt
-    		   16 $\times$ AMD Ryzen 7 5800H with Radeon Graphics
+    		   12 $\times$ AMD Ryzen 5 5600H with Radeon Graphics
     	    \vskip 8pt
 	    \end{minipage} & 
         \begin{minipage}{3.7cm}
 	       \vskip 8pt
-		      16 $\times$ AMD Ryzen 7 5800H with Radeon Graphics
+		      16 $\times$ AMD Ryzen 7 6800H with Radeon Graphics
 	       \vskip 8pt
 	    \end{minipage} \\\hline
     RAM &
@@ -261,64 +251,34 @@ memory: sudo dmidecode --type 17
 	    \end{minipage} & 
         \begin{minipage}{3.7cm}
     	    \vskip 8pt
-    		   2 $\times$ 32GB DDR4 Samsung SODIMM 3200 MT/s
+    		   2 $\times$ 16GB DDR4 SODIMM 3200 MT/s
     	    \vskip 8pt
 	    \end{minipage} & 
         \begin{minipage}{3.7cm}
 	       \vskip 8pt
-		      2 $\times$ 32GB DDR4 Samsung SODIMM 3200 MT/s
+		      2 $\times$ 16GB DDR5 SODIMM 4800 MT/s
 	       \vskip 8pt
 	    \end{minipage} \\\hline
     Network Card &
         \begin{minipage}{3.7cm}
 	       \vskip 8pt
-		      Realtek Semiconductor Co., LtdRTL8125 2.5GbE Controller
+		      Realtek Semiconductor Co., LtdRTL8125 2.5GbE Controller 1Git/s
 	       \vskip 8pt
 	    \end{minipage} & 
         \begin{minipage}{3.7cm}
-    	    \vskip 8pt
-    		   Realtek Semiconductor Co., LtdRTL8125 2.5GbE Controller
-    	    \vskip 8pt
+    	   \vskip 8pt
+    		Realtek Semiconductor Co., RTL8111/ 8168/8411 PCI Express 1Gbit/s
+    	   \vskip 8pt
 	    \end{minipage} & 
         \begin{minipage}{3.7cm}
           \vskip 8pt
-		      Realtek Semiconductor Co., LtdRTL8125 2.5GbE Controller
+		      Realtek Semiconductor Co., RTL8111/ 8168/8411 PCI Express 1Gbit/s
 	       \vskip 8pt
 	    \end{minipage} \\\hline\hline
 \textbf{Setup} & & & \\\hline
-    Operating System & Kubuntu 22.04 &  Ubuntu 22.04 & Ubuntu 22.04 \\\hline
-    Kernel &
-        \begin{minipage}{3.7cm}
-	       \vskip 8pt
-		      A
-	       \vskip 8pt
-	    \end{minipage} & 
-        \begin{minipage}{3.7cm}
-    	   \vskip 8pt
-    		   B
-    	   \vskip 8pt
-	    \end{minipage} & 
-        \begin{minipage}{3.7cm}
-	       \vskip 8pt
-		      C
-	       \vskip 8pt
-	    \end{minipage} \\\hline
-    Real-time Kernel &
-        \begin{minipage}{3.7cm}
-	       \vskip 8pt
-    		   A
-    	   \vskip 8pt
-	    \end{minipage} & 
-        \begin{minipage}{3.7cm}
-    	   \vskip 8pt
-    		   B
-    	   \vskip 8pt
-	    \end{minipage} & 
-        \begin{minipage}{3.7cm}
-    	   \vskip 8pt
-    		   C
-    	   \vskip 8pt
-	    \end{minipage} \\\hline
+    Operating System & Kubuntu 22.04 &  Kubuntu 22.04 & Kubuntu 22.04 \\\hline
+    Kernel & 5.15.0-1039-realtime & 5.15.0-1039-realtime & 5.15.0-1039-realtime  \\\hline
+    Real-time Kernel & PREEMPT\_RT & PREEMPT\_RT & PREEMPT\_RT \\\hline
     ROS version & Rolling & Rolling & Rolling \\\hline
         \begin{minipage}{3cm}
         \vskip 4pt
@@ -330,10 +290,16 @@ memory: sudo dmidecode --type 17
 	    \end{minipage} & 05d7a5ec73a02eab2c & 05d7a5ec73a02eab2c & 05d7a5ec73a02eab2c \\\hline
 \end{tabular}
     \caption{Three different computers were used for the evaluation. The table gives an overview of the used hardware, as well as the setup on each of the computers.}
-    \label{c3_tab_r2c_repos}
+    \label{c3_tab_pc_overview}
 \end{table}
-\subsection{Robots for Evaluation}
-The used robots for the evaluation are the KUKA KR 3 R540 \cite{noauthor_agile_nodate, noauthor_kuka_kr_3_agiluspdf_nodate}
+\subsection{Robots for Evaluation}\label{c3_sec_used_robots}
+The used robots for the evaluation are the KUKA KR 3 R540 \cite{noauthor_agile_nodate, noauthor_kuka_kr_3_agiluspdf_nodate} \todo{Write}
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=1\textwidth]{Figures/c3/robot_and_cell.pdf}
+	\caption{On the left, the KUKA KR 3 R540 is shown. Picture taken from \cite{noauthor_kuka_kr_3_agiluspdf_nodate}. On the right the \textit{ready2\_educate} platform is depicted in which the robots are mounted. Picture from \cite{noauthor_ready2_educate_nodate}.}
+	\label{c3_fig_r2c_mr_is}
+\end{figure}
 
 
 

@@ -109,7 +109,7 @@
 \newglossaryentry{ci}
 {
     name={\textit{CommandInterface}},
-    description={}
+    description={Special \gls{handle} which allows to read and write the value stored inside the Interface, thereby reading the state of the hardware and writing commands to it}
 }
 \newglossaryentry{ddsg}
 {
@@ -120,6 +120,11 @@
 {
     name={\gls{dof}},
     description={\acrlong{dof}}
+}
+\newglossaryentry{handle}
+{
+    name={\textit{Handle}},
+    description={Blanket term in the context of \gls{r2c} for \glspl{ci} and \glspl{si}. Handles interface the hardware and abstract away from it. }
 }
 \newglossaryentry{node}
 {
@@ -147,7 +152,7 @@
 \newglossaryentry{ri}
 {
     name={\textit{ReferenceInterface}},
-    description={}
+    description={\Glspl{ci} created and exported by a chained controller. Only terminologic difference, as \textit{ReferenceInterface} are in fact \glspl{ci}}
 }
 \newglossaryentry{rosg}
 {
@@ -178,7 +183,7 @@
 \newglossaryentry{si}
 {
     name={\textit{StateInterface}},
-    description={}
+    description={Special \gls{handle} which allows only reading the value stored inside the Interface, thereby reading the state of the hardware}
 }
 \newglossaryentry{sm}
 {
