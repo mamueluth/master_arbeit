@@ -7,10 +7,10 @@
 \section{Preparation Work}
 The concept should later be tested with real hardware at the described in \autoref{c3_sec_used_robots}. The used hardware are KUKA robots and communication with the robots is done via \gls{rsi}. There existed an old driver for the \gls{rsi} as well as a repository with the description of the used robot models.
 \subsection{Porting of the KUKA RSI to \gls{ros2} Rolling}
-The existing driver for the\gls{rsi} was only available for older versions of \gls{ros} and needed to be ported. 
+The existing driver for the \gls{rsi} was only available for older versions of \gls{ros} and needed to be ported. 
 The driver is implemented as a system and the interfaces of the driver had to be adapted to the signature used in \gls{ros2} Rolling. After the adaption, the drivers have been tested with the robots and some issues where found which needed fixing.\newline 
 The first issue discovered was timing related. The control loop of the standard control node in \gls{r2c} consist roughly of five steps as listed in the following:\newline
-\lstset{language=C++,basicstyle=\scriptsize}
+\lstset{language=C++,basicstyle=\small}
 \begin{lstlisting}[caption=Pseudo code for the control loop.,label=c5_code_control_loop]
 // creat controller manager with an rclcpp::executor
 auto cm = 
@@ -28,7 +28,7 @@ The communication with the robot controller needs to be neatly timed. The driver
 As solution, for the communication with the robot controller the sleep in the control node (step 5 in \autoref{c5_code_control_loop}) is omitted. The synchronization between the robot controller and the controller manager is done via the incoming messages of the robot controller, which acts as clock generator.
 
 A second issue discovered was that the default clock used for the control node does not provide a monotonic increasing time. This leads on platforms where no real-time kernel is installed and especially embedded devices to issues. As a solution, the control node is started with a clock where the time is incremented in monotonic steps as shown in \autoref{c5_code_monotonic_time}
-\lstset{language=C++,basicstyle=\scriptsize}
+\lstset{language=C++,basicstyle=\small}
 \begin{lstlisting}[caption=Small code extract for setting monotonic clock.,label=c5_code_monotonic_time]
 rclcpp::NodeOptions node_options;
 node_options.clock_type(rcl_clock_type_t::RCL_STEADY_TIME);
@@ -42,13 +42,13 @@ auto cm = std::make_shared<controller_manager::ControllerManager>(executor,
 The ported \gls{rsi} drivers have then been added to the \textit{kuka\_experimental} repository, which includes the description files of the used robots. The descriptions were updated to include parameters to pass the IP address and port to the driver. Additionally, some restructuring was done to ease the selection and starting of the correct description files. \todo{maybe a bit more}
 
 \section{Adaptions in the \gls{r2c} Framework}
-In order to support distributed control of multiple robots in \gls{r2c} a few changes, had to be implemented. In the following first, some preliminary changes are introduced which provide the basis for implementing the proposed concept. Then the changes of the handles and how the controller manager has been adapted are presented.
+In order to support distributed control of multiple robots in \gls{r2c} a few changes, had to be implemented. In the following first, some preliminary changes are introduced which provide the basis for implementing the proposed concept. Then the changes of the \glspl{handle} and how the controller manager has been adapted are presented.
 
 \subsection{Allow to Start with Empty Robot Description File}
 The description of the hardware including which \glspl{ci} and \glspl{si} are provided is normally described in a '\texttt{.xacro}' file. This file is then passed to the controller manager, parsed and the \glspl{ci} and \gls{si} are exported by the hardware. 
 As described in \autoref{sec:concept}, a central controller manager does not need to have its own hardware. It imports the \glspl{ci}, \glspl{si} and \glspl{ri} of the sub-controller managers. The problem is, that in \gls{r2c} a controller manager must have its own hardware. In addition, it is not possible to pass the robot description file to the controller manager other than via file at startup. In a distributed setting, it would be an advantage to start a sub-controller manager and then pass the description of the hardware later so that the system is more flexible. \newline
-Consequently, the controller manager was changed to allow passing an empty robot description file. The change includes the possibility to now pass the robot description file now over the \textit{~/robot\_description} topic. At construction time it is checked if the robot description file passed to the controller manager is empty. If no robot description is passed via file, it is continued without initializing of the resource manager. The controller manager subscribes to the \textit{~/robot\_description} topic relative to its own private namespaces. This is done to avoid clashes, if multiple controller managers are present, which possibly all get a different hardware passed. The subscription is set to \textit{transient\_local} which is similar to 'latching' publishers in \gls{ros}. This is needed, that a late joining controller manager still gets the description if it has been published, before the controller manager can subscribe to the topic. A code small snippet is presented in \autoref{c5_code_robot_description}.
-\lstset{language=C++,basicstyle=\scriptsize}
+Consequently, the controller manager was changed to allow passing an empty robot description file. The change includes the possibility to now pass the robot description file now over the \textit{~/robot\_description} topic. At construction time it is checked if the robot description file passed to the controller manager is empty. If no robot description is passed via file, it is continued without initializing of the resource manager. The controller manager subscribes to the \textit{~/robot\_description} topic relative to its own private namespaces. This is done to avoid clashes, if multiple controller managers are present, which possibly all get a different hardware passed. The subscription is set to \textit{transient\_local} which is similar to 'latching' publishers in \gls{ros}. This is needed, so that a late joining controller manager still gets the description when it is published, before the controller manager can subscribe to the topic. A code small snippet is presented in \autoref{c5_code_robot_description}.
+\lstset{language=C++,basicstyle=\small}
 \begin{lstlisting}[caption=Small code snippet for usage of the robot\_description topic.,label=c5_code_robot_description]
 // ControllerManager constructor
 {   ...
@@ -68,10 +68,10 @@ Consequently, the controller manager was changed to allow passing an empty robot
 \end{lstlisting}
 
 \subsection{Activation of Hardware}
-After the robot description file has been parsed and the resource manager initialized, the hardware is automatically activated by default. There is no way to configure or activate the hardware components later or  at a specific time. In a distributed setting, this can potentially lead to issues, as a sub-controller manager would instantly activate and start to communicating with its hardware. This should however only be done after the sub-controller manager has registered itself at the central controller manager.\newline
-To tackle this, a hardware spawner has been introduced. The hardware spawner is a standalone executable which acts as interface for the \textit{~/set\_hardware\_component\_state} service of the controller manager. It handles service call and allows configuring or activate a hardware component after the resource manager has been initialized and the \glspl{ci} and \glspl{si} have been imported into the resource storage. This way a sub-controller manager can be initialized. Then the \glspl{ci} and \glspl{si} can be created and registered at the central controller. This can now be done before the hardware component is activated and communication with the real hardware started.\newline
+After the robot description file has been parsed and the resource manager initialized, the hardware is automatically activated by default. There is no way to configure or activate the hardware components later or  at a specific time. In a distributed setting, this can potentially lead to issues, as a sub-controller manager would instantly activate and start to communicating with its hardware. However, this should only be done after the sub-controller manager has registered with the central controller manager.\newline
+To tackle this, a hardware spawner has been introduced. The hardware spawner is a standalone executable which acts as interface for the \lstset{language=C++,basicstyle=\small\ttfamily}\lstinline{~/set_hardware_component_state} service of the controller manager. It \glspl{handle} service call and allows configuring or activate a hardware component after the resource manager has been initialized and the \glspl{ci} and \glspl{si} have been imported into the resource storage. This way a sub-controller manager can be initialized. Then the \glspl{ci} and \glspl{si} can be created and registered at the central controller. This can now be done before the hardware component is activated and communication with the real hardware started.\newline
 The activation can then either be directly in the Python launch file as shown in \autoref{c5_code_hardware_spawning_launch} or via the command line as shown in the \autoref{c5_code_hardware_spawning_cli}. Both examples are activating the
-\lstset{language=Python,basicstyle=\scriptsize}
+\lstset{language=Python,basicstyle=\small}
 \begin{lstlisting}[caption=Example of using the hardware spawner in a python launch file.,label=c5_code_hardware_spawning_launch]
     hardware_activation = Node(
         package="controller_manager",
@@ -79,7 +79,7 @@ The activation can then either be directly in the Python launch file as shown in
         arguments=["ComponentName", "--activate"],
     )
 \end{lstlisting}
-fictional hardware component called 'ComponentName'. The only difference is, that with the Python launch file the old behavior is preserved as the hardware is 'automatically' activated at the launch time. Additionally, other nodes can be started timed after the hardware has been successfully activated. What previously was not possible. On the other hand, the hardware can be activated manually from the command line, which was not possible either.
+fictional hardware component called 'ComponentName'. The only difference is that with the Python launch file the old behavior is preserved as the hardware is 'automatically' activated at the launch time. Additionally, other nodes can be started timed after the hardware has been successfully activated. What previously was not possible. On the other hand, the hardware can be activated manually from the command line, which was not possible either.
 \lstset{
     basicstyle=\fontsize{10}{12}\ttfamily,
     columns=fullflexible,
@@ -90,30 +90,89 @@ fictional hardware component called 'ComponentName'. The only difference is, tha
 ros2 run controller_manager haelware_spawner "ComponentName" 
     --activate
 \end{lstlisting}
-\subsection{Adaption of Handles}
-As described in \autoref{c4_sec_adaption_of_handles} the \glspl{handle} are the point where the system is split. 
+
+\subsection{Chainable Joint Trajectory Controller}
+In order to test the concept of distributed chained controllers, the \textit{JointTrajectoryController} needs to be chainable. For this the \textit{JointTrajectoryController} now inherits from the \textit{ChainableControllerInterface}. The controller now can be set to chained mode. On setting the chained mode, the controller creates and exports \glspl{ri} for each of the joints position, velocity, acceleration and effort \gls{ci} it controls.\newline
+\lstset{language=C++,basicstyle=\small}
+\begin{lstlisting}[caption=Update function for \textit{ChainableControllerInterface}.,label=c5_code_chainable_update]
+return_type ChainableControllerInterface::update(
+  const rclcpp::Time & time, const rclcpp::Duration & period)
+{
+  return_type ret = return_type::ERROR;
+  if (!is_in_chained_mode())
+  {
+    ret = update_reference_from_subscribers(time, period);
+    if (ret != return_type::OK)
+    {
+      return ret;
+    }
+  }
+  ret = update_and_write_commands(time, period);
+  return ret;
+}
+\end{lstlisting}
+One thing that had to be considered was that a for a chained controller that is not in chained mode, the \lstset{language=C++,basicstyle=\small\ttfamily}\lstinline{update(time, period)} function calls the \lstset{language=C++,basicstyle=\small\ttfamily}\lstinline{update_and_write_commands(...)} before writing the commands. Like the name suggests, in this case the \glspl{ri} are updated locally with the contents from the subscribers instead of being set by a controller chained controller. This is illustrated in \autoref{c5_code_chainable_update}. However, for the \textit{JointTrajectoryController} this leads to a problem. A chained controller expects one \gls{ri} per \gls{ci} of the \textit{JointTrajectoryController}. On the other hand, if the \gls{ri} are updated by the \textit{JointTrajectory Message} of a publisher subscribed to, this message can contain multiple \textit{JointTrajectoryPoint} points. As a result, the \gls{ri} would need to be multidimensional. \newline
+As a workaround, instead of updating the \gls{ri} in the \lstset{language=C++,basicstyle=\small\ttfamily, breaklines=true}\lstinline{update_reference_from_subscribers(...)} \todo{fix}function, it is checked inside the \lstset{language=C++,basicstyle=\small\ttfamily}\lstinline{update_and_write_commands(...)} if the controller is in chained mode or not. If chained mode is enabled, then a new \textit{JointTrajectory Message} is created from the \glspl{ri} and used for calculating the trajectory. Otherwise, the \textit{JointTrajectory Message} is directly taken from the publishers.
+
+\subsection{Adaption of the Handles}
+As described in \autoref{c4_sec_adaption_of_handles} the \glspl{handle} are the point where the system is split.One problem that arises here is that the \glspl{handle} only store a pointer to a value of the hardware, see \autoref{c3_sec_link_ctrl_hw}. Therefore, neither a \gls{si} nor a \gls{ci} can know when the value has been changed by the hardware. This poses a problem as in the distributed case the value of the \gls{handle} should be published, if changed. There are two different ways to approach this, each with its own advantages and disadvantages.
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=1\textwidth]{Figures/c5/Handles_UML.pdf}
 	\caption{UML diagram of the different \gls{handle} types, including the new introduced distributed \glspl{handle}. One should note, that the UML diagram does not contain every member and function of the classes, but only shows the most important parts. }
 	\label{c5_fig_handle_uml}
 \end{figure}
+\subsubsection*{Publish Value Periodically}\todo{preceice enough? More explanation of functions, details???}
+The first approach is to publish the value of the \gls{handle} on timer. With this approach, the creation of the \glspl{handle} in the hardware can stay the same. \autoref{c5_fig_handle_uml} displays the adapted class hierarchy as well as the new introduced distributed \glspl{handle}. The former base class \textit{ReadOnlyHandle} has been replaced by a \textit{HandleInterface}, \textit{ReadHandleInterface} and a \textit{WriteHandleInterface}. This has been done in order to have a clear separation of readable and writable \glspl{handle}. The \textit{HandleInterface} is the base class for all \glspl{handle} and contains basic functionality as getting a full qualified name, namesapce and the like, as well as storing the pointer to the value. The \textit{ReadHandleInterface} ensures that all readably \glspl{handle} implement the \textit{get\_value()} function for retrieving the stored value of the pointer. The \textit{WriteHandleInterface} on the other hand, ensures that all writable Interfaces have a \textit{set\_value()} function for commanding the \textit{handle}. \newline
+The \textit{ReadOnlyHandle} is now only the base class of readable \glspl{handle} and not of all \glspl{handle} as before. The same applies for the \textit{ReadWriteHandle}. Next, the \textit{DistributedReadOnlyHandle} and \textit{DistributedReadWriteHandle} as well as their subclasses \textit{DistributedStateInterface} and \textit{DistributedCommandInterface} have been introduced. This change allowed to use shared pointers inside the resource storage and set the type for the \glspl{si} to \textit{ReadOnlyHandle} and \textit{ReadWriteHandle} for the \glspl{ci}. Then at runtime we can either store a \gls{si} or a distributed \gls{si} and the correct \lstset{language=C++,basicstyle=\small\ttfamily}\lstinline{get_value()} function is called with dynamic binding. The same applies for the \gls{ci} and distributed \gls{ci}. \newline
+The new introduced distributed \glspl{handle} are then for the central controller site. The central controller creates them and stores them inside its resource storage. Controllers can then claim them as they would with any \gls{ci} or \gls{si} interface. The only difference is, that for a distributed \gls{handle} the value is received over a \gls{ros2} topic from the counterpart on the sub-controller manger site and then stored inside the \gls{handle}. If a controller writes a command to a distributed \gls{ci} and the value is immediately published. \newline
+For the sub-controller manager site, two new wrapper classes have been introduced. One is called \textit{StatePublisher} and the other \textit{CommandForwarder}. If a \gls{si} should be distributed and its value should be published, then the \gls{si} is claimed, a loan created and passed to the \textit{StatePublisher}. The \textit{StatePublisher} then checks the value of the \gls{si} periodically and publishes it. This way the \gls{si} can stay completely the same and the hardware doesn't need to know if the \gls{si} it exports is distributed or not. For a \gls{ci} the same happens with the \textit{CommandForwarder}. The only difference is, that a \textit{CommandForwarder} additionally subscribes to the topic provided by the distributed \gls{ci} at the central controller manager and on receiving a command, sets the command via loan in the actual \gls{ci}.\todo{Maybe more details? Functions and stuff? namespace or better bei weiter hinten?}
 
+In summary, the \glspl{handle} have been clearly separated into readable and writable \glspl{handle}. The distributed \glspl{handle} receive/send their value over topics. The distributed \glspl{handle} are for the central controller manager site, for the sub-controller manager site wrappers for the handles have been introduced.\todo{Remove small summary?}\newline 
+Advantages with this approach are mainly that the way the \glspl{handle} are exported by the hardware stays the same. The same applies to how values are set and retrieved. No changes are needed, neither on the hardware nor on the controller site.\newline
+A disadvantage is, that a \gls{handle} does not know when the value by the hardware has been changed. This way the value needs to be published periodically.
 
-One problem that arises here is that the \glspl{handle} only store a pointer to the value of the hardware, see \autoref{c3_sec_link_ctrl_hw}. Therefore, the neither a \gls{si} nor a \gls{ci} can know when the value has been changed by the hardware. This poses a problem as in the distributed case the value of the \gls{handle} should be published, if changed. There are two different ways to approach this, each with its own advantages and disadvantages.
-\subsubsection*{Publish Value Periodically}
-The first approach is to publish the value of the \gls{handle} on timer. One should note, that 
-\subsubsection*{Rewrite of the Handles}
+\subsubsection*{Store Value Instead of Pointer} \todo{Wurde nur so proof of proof of concept mäßig getested, ist nicht in results stand jetzt, soll überhaupt erwähnt werden?}
+The second way to approach this problem is to replace the pointer to a value inside the \glspl{handle} by a value. This seemingly small change has a profound impact on the \gls{r2c} framework. The basic changes presented in the section before stay the same. We still can introduce the new \gls{handle} structure as well as the distributed \glspl{handle} and wrapper classes. The only different concerning those changes it that now the \textit{StatePublisher} and \textit{CommandForwarder} can publish on value change like the distributed \gls{ci} and \gls{si}. This is potentially an advantage. An additional advantage is, that the \glspl{handle} now provide functionality to check if a new value has been set or a value has been read from the handle. This is not only true for the hardware, but for the controllers as well. \newline
+However, a major drawback is that this changes the way \gls{ci} and \gls{si} are exported. The hardware now no longer creates and exports the \glspl{handle}, but instead only exports a description of them. The \gls{si} and \gls{ci} are instead created inside the resource storage. Further, the hardware does not allocate memory for the states and commands, but instead is assigned loans to the created \glspl{si} and \glspl{ci}. In order to minimize this change, the \textit{System} and \textit{SystemInterface} have been adapted to provide a default implementation for the exportation of the \gls{ci} and \gls{si} description. This can not avoid, that every driver needs to be adjusted. More over, the same changes would need to be applied to the \textit{Actuator} and \textit{Sensor} classes as well. Because of this impact, this approach had only been implemented to show the feasibility and presented to the community to discuss if the advantages outweigh the disadvantages. 
+
 \section{Controller Manager Hierarchy}
+The existing controller manager was divided into a normal, central and sub-controller manager, as described in \autoref{c4_sec_overview}. The normal controller manager is basically the existing controller manager. The central and sub-controller mangers are the entities described in \autoref{sec:concept}. How to configure a controller manager as either central or sub-controller manger as well as some implementation details are described in the following section. We thereby distinguish between the "Distributed Drivers" case (see \autoref{c4_sec_distributed_drivers}) and the "Distributed Chained Control" case (see \autoref{c4_sec_distributed_controller_chaining}).
 
 \subsection{Central Controller Manager}
-chainable controller interface
-\subsubsection{Configuration of a Central Controller Manager}
-\lstset{language=yaml,basicstyle=\scriptsize}
+The central controller manager creates after during the initialization the services for registration of a sub-controller manager and registration of the reference interfaces. As shown in \autoref{c5_code_qos_distribtued_services} the \gls{qos} for the distributed services were set to keep all and the reliability was set to reliable so that no registration attempt is lost. 
+\lstset{language=C++,basicstyle=\small}
+\begin{lstlisting}[caption=\gls{qos} for central controller managers distributed services.,label=c5_code_qos_distribtued_services]
+    rclcpp::QoS(rclcpp::QoSInitialization(RMW_QOS_POLICY_HISTORY_KEEP_ALL, 10)).reliable().durability_volatile();
+\end{lstlisting}
+
+\subsubsection{The Registration Process}
+The request and response for the registration can be seen in \autoref{c5_code_registraion_srv}. As shown consists the registration request for registering a sub-controller manager, of the sub-controller manager's name and namespace, as well as information about the topics provided by the \textit{StatePublishers} and \textit{CommandForwarders}. This information is then wrapped inside a \textit{SubControllerManagerWrapper}. This wrapper class interfaces all the information received with the registration call. The namespace of each sub-controller manager must be unique to distinguish them. Each of the sub-controller manager operates in its own namespace. This was implemented this way, in order to avoid name clashes between the publishers provided by each of the sub-controller managers \textit{StatePublishers} and \textit{CommandForwarders}. The information of those publishers is wrapped in a \textit{PublisherDescription} containing the namespace, prefix, interface name and topic name. The  \textit{SubControllerManagerWrapper}is then added to a map to avoid registering multiple sub-controller managers or identify multiple registration calls from one sub-controller manager.\newline
+For each \textit{StatePublishers} a distributed \gls{si} is created. This distributed \gls{si} subscribes to the topic in the namespace provided by the \textit{PublisherDescription}. The distributed \gls{si} is then added to the available \glspl{si}.
+\lstset{language=C++,basicstyle=\small}
+\begin{lstlisting}[caption=Request and response of the registraion service.,label=c5_code_registraion_srv]
+# Request
+sub_controller_manager_namespace
+string sub_controller_manager_name
+controller_manager_msgs/PublisherDescription[] state_publishers
+controller_manager_msgs/PublisherDescription[] command_state_publishers
+---
+# Response
+controller_manager_msgs/PublisherDescription[] command_state_publishers
+bool ok
+\end{lstlisting}
+For each of the \textit{CommandForwarders} a distributed \gls{ci} is created and added to the available \glspl{ci}. Additionally to subscribing to the topic provided by the \textit{CommandForwarder}, a publisher is created. The information about this publisher is then wrapped in a \textit{PublisherDescription} and send back to the registering sub-controller manager with the response of the service call. 
+
+The registration call for registering a sub-controller manager's reference interfaces, consists of the sub-controller manager's name and namespace, as well as information about the topics provided by \textit{CommandForwarders} for the \glspl{ri}. From this point on the same logic as for the registration of a \textit{CommandForwarders} in the registration of a sub-controller manager applies.
+
+\subsubsection{Configuration of a Central Controller Manager}\label{c5_sec_central_controller_manager_conf}
+The configuration of the controller managers is done with a \texttt{.yaml} file. In \autoref{c5_l_central_controller_manager_config} the configuration of a central controller manager with no controller chaining is shown. The file includes the exemplary configuration of a \textit{JointTrajectoryController} that controls the joints of the robots of the sub-controller managers. This corresponds to the "Distributed Drivers" case described in \autoref{c4_sec_distributed_drivers}. 
+\lstset{language=yaml,basicstyle=\small}
 \begin{lstlisting}[caption=Example configuration of a central controller manager with a joint trajecotry controller.,label=c5_l_central_controller_manager_config]
 controller_manager:
   ros__parameters:
     central_controller_manager: true
+    handles_qos_key: "sensor_data"
     
     position_trajectory_controller:
       type: joint_trajectory_controller/JointTrajectoryController
@@ -123,15 +182,11 @@ position_trajectory_controller:
     joints:
       - /sub_1/sub_1_joint_a1
       - /sub_1/sub_1_joint_a2
-      - /sub_1/sub_1_joint_a3
-      - /sub_1/sub_1_joint_a4
-      - /sub_1/sub_1_joint_a5
+        ... # joint a3 - a5
       - /sub_1/sub_1_joint_a6
       - /sub_2/sub_2_joint_a1
       - /sub_2/sub_2_joint_a2
-      - /sub_2/sub_2_joint_a3
-      - /sub_2/sub_2_joint_a4
-      - /sub_2/sub_2_joint_a5
+        ... # joint a3 - a5
       - /sub_2/sub_2_joint_a6
 
     command_interfaces:
@@ -141,13 +196,21 @@ position_trajectory_controller:
       - position
     ... # Some configuration for JointTrajectoryController 
 \end{lstlisting}
+The most important part to note is the \lstset{language=yaml,basicstyle=\small\ttfamily, breaklines=true}\lstinline{central_controller_manager} flag. If this flag is set to "true", the controller manager is configured as central controller manager. With the \texttt{handles\_qos\_key} the \gls{qos} for the publisher and subscribers of the distributed \glspl{ci} and \gls{si} can be set. With he \lstset{language=yaml,basicstyle=\small\ttfamily, breaklines=true}\lstinline{sensor_data} \gls{qos} the history is set to "\textit{KEEP\_LAST}". The queue size is set to five. Reliability is set to "\textit{BEST\_EFFORT}". This is done for a better performance. For an overview of the available \gls{qos} profiles and an explanation, refer to \autoref{sec:app-qos} in the appendix.\newline
+In the next part a \textit{JointTrajectoryController} is configured for the central controller manager. With the \lstset{language=yaml,basicstyle=\small\ttfamily, breaklines=true}\lstinline{joints} parameter in combination with the 
+\lstset{language=yaml,basicstyle=\small\ttfamily, breaklines=true}\lstinline{command_interfaces} and \lstset{language=yaml,basicstyle=\small\ttfamily, breaklines=true}\lstinline{state_interfaces} it is defined, which \glspl{ci} and \glspl{si} the controller should claim. As can be seen, the controller doesn't need to know that the \glspl{ci} and \glspl{si} it claims are in fact distributed. The only hint, that they are distributed is the prefix "/sub\_1" for the distributed \glspl{handle} of the first sub-controller manager and the prefix "/sub\_2" for the second sub-controller manager.\
 
-\subsubsection{Configuration of a Chained Central Controller Manager}
-\lstset{language=yaml,basicstyle=\scriptsize}
+The counterpart of a sub-controller manager for this case is shown in \autoref{c5_sec_sub_controller_configuration}.
+
+\subsubsection{Configuration of a Chained Central Controller Manager}\label{c5_configuration_of_chained_central_controller_manager}
+The configuration of a chained central controller manager shown in \autoref{c5_l_chained_central_controller_manager_config}. This corresponds to the "Distributed Chained Control" case described in \autoref{c4_sec_distributed_controller_chaining}. The configuration for the most parts the same. Instead of a \textit{JointTrajectoryController} a \textit{ForwardCommandController} is configured. The output of the \textit{ForwardCommandController} is then chained to the input of a \textit{JointTrajectoryControllers} in the sub-controller managers. As with the distributed \glspl{handle} in the configuration in \autoref{c5_l_central_controller_manager_config} the \textit{ForwardCommandController} does not need to know that the claimed \glspl{ci} are in fact distributed \glspl{ci} (distributed \glspl{ri} to be more preceise). That the \glspl{ci}
+are distributed is only indicated through the prefix "/sub\_1" respcetively "/sub\_2" for the first and second sub-controller manager. That the interfaces are in fact \glspl{ri} is indicated through the name of the controller in the sub-controller manager in the name of the \gls{ci}. In this case "position\_trajectory\_controller". \newline
+\lstset{language=yaml,basicstyle=\small}
 \begin{lstlisting}[caption=Example configuration of a chained central controller manager.,label=c5_l_chained_central_controller_manager_config]
 controller_manager:
   ros__parameters:
     central_controller_manager: true
+    handles_qos_key: "sensor_data"
 
     fpc_jtc_chain_controller:
       type: forward_command_controller/ForwardCommandController
@@ -157,39 +220,72 @@ fpc_jtc_chain_controller:
     joints:
       - /sub_1/position_trajectory_controller/sub_1_joint_a1
       - /sub_1/position_trajectory_controller/sub_1_joint_a2
-      - /sub_1/position_trajectory_controller/sub_1_joint_a3
-      - /sub_1/position_trajectory_controller/sub_1_joint_a4
-      - /sub_1/position_trajectory_controller/sub_1_joint_a5
+        ... # joint a3 - a5
       - /sub_1/position_trajectory_controller/sub_1_joint_a6
       - /sub_2/position_trajectory_controller/sub_2_joint_a1
       - /sub_2/position_trajectory_controller/sub_2_joint_a2
-      - /sub_2/position_trajectory_controller/sub_2_joint_a3
-      - /sub_2/position_trajectory_controller/sub_2_joint_a4
-      - /sub_2/position_trajectory_controller/sub_2_joint_a5
+        ... # joint a3 - a5
       - /sub_2/position_trajectory_controller/sub_2_joint_a6
     interface_name: position
 \end{lstlisting}
-
+The counterpart of a sub-controller manager for this case is shown in \autoref{c5_sec_sub_chained_controller_configuration}.
 \subsection{Sub-Controller Manager}
+\subsubsection{The Registration Process}\label{c5_registration_sub_controller}
+On initialization of a sub-controller manager, first the \textit{StatePublishers} and \textit{CommandForwarders} for the corresponding \glspl{ci} and \gls{si} described in the configuration file are created. For each of the given \gls{si} or \gls{ci} the interface is claimed whereby loans of the interfaces are created. These loans are then passed to the \textit{StatePublishers} and \textit{CommandForwarders}. On creation, the publishers are created. The publishers are created relative to the namespace of the sub-controller manager, together with a suffix indicating the publisher type. As example: If a sub-controller manager operates in the "/sub\_1" namespace and a joint is called "joint\_a1", then the \textit{StatePublishers} would create a topic called "/sub\_1/joint\_a1\_state".\newline
+Additionally, a timer is created for publishing the value of the \gls{si} or \gls{ci} periodically. The frequency can be controlled with a parameter in the configuration file. After the creation, the \textit{StatePublishers} and \textit{CommandForwarders} are stored inside a map in the resource storage. \newline
+After that, the actual registration process takes place. This is illustrated in very high level in \autoref{c5_pseudo_registration}. First, the request is created. Then for every \textit{StatePublishers} and \textit{CommandForwarders} the description of the created publishers in generated and added to the request. Then it is checked if the registration service of the central controller manager is available. Currently, the service registration service ("/register\_sub\_controller\_manager") is expected to be in the root namespace. This could be optimized to allow starting the central controller manager in its own private namespace as well. If the service is available, the request is sent, and it is waited for the response. If the registration succeeded, then each of the \textit{CommandForwarders} is subscribed to the topics created by the distributed \glspl{ci} to receive its command.
+\begin{algorithm}
+	\caption{Registration of a sub-controller manager}
+\begin{algorithmic}[1]
+\Procedure{RegisterSubControllerManager}{}
+  \State $\text{request} \gets \text{create\_request}()$
+  \State $\text{populate\_state\_publishers}(\text{request})$
+  \State $\text{populate\_command\_forwarders}(\text{request})$
+  \State $\text{wait\_for\_service}(\text{"/register\_sub\_controller\_manager"})$
+  \State $\text{send\_request\_async}(\text{"/register\_sub\_controller\_manager"}, \text{request})$
+  \State $\text{wait\_for\_result}()$
+  \If{$\text{registration\_successful}()$}
+    \State $\text{subscribe\_to\_distributed\_commandInterfaces}()$
+    \State $\text{log\_info}(\text{"Successfully registered."})$
+  \Else
+    \State $\text{log\_warn}(\text{"Registration failed."})$
+  \EndIf
+\EndProcedure
+\end{algorithmic}\label{c5_pseudo_registration}
+\end{algorithm}
 
-\subsubsection{Configuration of a Sub-Controller Manager}
-\lstset{language=yaml,basicstyle=\scriptsize}
+\subsubsection{The Registration Process of \Glspl{ri}}
+The registration process for the \glspl{ri} is in the most parts the same as described in \autoref{c5_registration_sub_controller} and outlined in \autoref{c5_pseudo_registration}. The main difference is, that as the controller of the sub-controller manager is set to chained mode \textit{CommandForwarders} for the \glspl{ri} are created. Those are then registered with the "/register\_sub\_controller\_manager\_references". After the registration, the \textit{CommandForwarders} are then subscribed to the distributed \glspl{ci} publishers of the central controller manager as well.
+
+\subsubsection{Configuration of a Sub-Controller Manager}\label{c5_sec_sub_controller_configuration}
+In \autoref{c5_l_sub_controller_manager_config} it is shown how to configure a sub-controller manager for the "Distributed Driver" case described in \autoref{c4_sec_distributed_drivers}. This configuration is the counterpart for the configuration of the central controller manager described in \autoref{c5_sec_central_controller_manager_conf}.\newline
+The first thing to note is, that at the beginning, the sub-controller manager is configured to operate in its own private namespace called "/sub\_1". The most important part is the \lstset{language=yaml,basicstyle=\small\ttfamily, breaklines=true}\lstinline{sub_controller_manager} flag. This configures the controller manager to be a sub-controller manager. \lstset{language=yaml,basicstyle=\small\ttfamily, breaklines=true}\lstinline{handles_qos_key} has the same effect as for the central controller manager.
+\lstset{language=yaml,basicstyle=\small}
 \begin{lstlisting}[caption=Example configuration of a sub-controller manager which exports all of it's command and state interfaces.,label=c5_l_sub_controller_manager_config]
 /sub_1/controller_manager:
   ros__parameters:
-    update_rate: 10  # Hz
     sub_controller_manager: true
     distributed_interfaces_publish_period: 4 # ms
+    handles_qos_key: "sensor_data"
+    export_state_interfaces:
+      - /sub_1/sub_1_joint_a1
+      - /sub_1/sub_1_joint_a2
+        ... # joint a3 - a5
+      - /sub_1/sub_1_joint_a6
 \end{lstlisting}
+With the \lstset{language=yaml,basicstyle=\small\ttfamily, breaklines=true}\lstinline{distributed_interfaces_publish_period} flag, the period in milliseconds for publishing the values inside the \textit{StatePublishers} and \textit{CommandForwarders} can be controlled. Finally, with the 
+\lstset{language=yaml,basicstyle=\small\ttfamily, breaklines=true}\lstinline{export_state_interfaces} and \lstset{language=yaml,basicstyle=\small\ttfamily, breaklines=true}\lstinline{export_command_interfaces} flags, the \glspl{si} and \glspl{ci} which should be exported can be set. If the parameter is not defined, as it is the case with the \lstset{language=yaml,basicstyle=\small\ttfamily, breaklines=true}\lstinline{export_command_interfaces} in this example, all available \glspl{ci} are exported. The same applies for the \glspl{si}.
 
-\subsubsection{Configuration of a Chained Sub-Controller Manager}
-\lstset{language=yaml,basicstyle=\scriptsize}
+\subsubsection{Configuration of a Chained Sub-Controller Manager}\label{c5_sec_sub_chained_controller_configuration}
+In \autoref{c5_l_chained_sub_controller_manager_config} it is shown how to configure a sub-controller manager for the "Distributed Chained Control" case described in \autoref{c4_sec_distributed_controller_chaining}. This configuration is the counterpart for the configuration of the central controller manager described in \autoref{c5_configuration_of_chained_central_controller_manager}.\newline
+The difference to the configuration file in \autoref{c5_l_sub_controller_manager_config} is that in this case neither any \glspl{si} nor any \glspl{ci} are exported. This is due to the fact, that a \textit{JointTrajectoryController} is configured locally and claims them inside the sub-controller manager. In order to avoid claiming and exporting any interfaces, the flags need to be set to an empty array. This could be optimized in the future. Setting of the chained mode of the controller, as well as exporting the \glspl{ri} is handled by the sub-controller manager itself. 
+\lstset{language=yaml,basicstyle=\small}
 \begin{lstlisting}[caption=Example configuration of a chained sub-controller manager.,label=c5_l_chained_sub_controller_manager_config]
 /sub_1/controller_manager:
   ros__parameters:
-    update_rate: 10  # Hz
     sub_controller_manager: true
     distributed_interfaces_publish_period: 4
+    handles_qos_key: "sensor_data"
     export_command_interfaces:
       - ""  # don't export any command interfaces
     export_state_interfaces:
@@ -203,9 +299,7 @@ fpc_jtc_chain_controller:
     joints:
       - sub_1_joint_a1
       - sub_1_joint_a2
-      - sub_1_joint_a3
-      - sub_1_joint_a4
-      - sub_1_joint_a5
+        ... # joint a3 - a5
       - sub_1_joint_a6
 
     command_interfaces:
