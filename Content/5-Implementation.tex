@@ -8,17 +8,19 @@
 The concept should later be tested with real hardware at the described in \autoref{c3_sec_used_robots}. The used hardware are KUKA robots and communication with the robots is done via \gls{rsi}. There existed an old driver for the \gls{rsi} as well as a repository with the description of the used robot models.
 \subsection{Porting of the KUKA RSI to \gls{ros2} Rolling}
 The existing driver for the \gls{rsi} was only available for older versions of \gls{ros} and needed to be ported. 
-The driver is implemented as a system and the interfaces of the driver had to be adapted to the signature used in \gls{ros2} Rolling. After the adaption, the drivers have been tested with the robots and some issues where found which needed fixing.\newline 
+The driver is implemented as a system and the interfaces of the driver had to be adapted to the signature used in \gls{ros2} Rolling. After the adaption, the drivers have been tested with the robots and some issues were found which needed fixing.\newline 
 The first issue discovered was timing related. The control loop of the standard control node in \gls{r2c} consist roughly of five steps as listed in the following:\newline
 \lstset{language=C++,basicstyle=\small}
 \begin{lstlisting}[caption=Pseudo code for the control loop.,label=c5_code_control_loop]
 // creat controller manager with an rclcpp::executor
 auto cm = 
-    std::make_shared<controller_manager::ControllerManager>(executor, cm_node_name);
+    std::make_shared<controller_manager::ControllerManager>
+        (executor, cm_node_name);
 while (rclcpp::ok())
 {   
     // step 1: calculated meassured_period
-    cm->read(cm->now(), measured_period); // step 2: BLOCKING in RSI driver
+    // Call read in RSI driver
+    cm->read(cm->now(), measured_period); // step 2: BLOCKING 
     cm->update(cm->now(), measured_period); // step 3
     cm->write(cm->now(), measured_period); // step 4
     //step 5 sleep until next iteration
@@ -33,8 +35,10 @@ A second issue discovered was that the default clock used for the control node d
 rclcpp::NodeOptions node_options;
 node_options.clock_type(rcl_clock_type_t::RCL_STEADY_TIME);
 // creat controller manager with an rclcpp::executor
-auto cm = std::make_shared<controller_manager::ControllerManager>(executor,
-            cm_node_name, node_options);
+auto cm = std::make_shared<
+            controller_manager::ControllerManager>(
+                executor,
+                cm_node_name, node_options);
  // control loop
 \end{lstlisting}
 
@@ -51,19 +55,22 @@ Consequently, the controller manager was changed to allow passing an empty robot
 \lstset{language=C++,basicstyle=\small}
 \begin{lstlisting}[caption=Small code snippet for usage of the robot\_description topic.,label=c5_code_robot_description]
 // ControllerManager constructor
-{   ...
-    if(robot_description.empty()) {
-         create_subscription<std_msgs::msg::String>(
-        "~/robot_description", rclcpp::QoS(1).transient_local(),
-        std::bind(&ControllerManager::robot_description_callback, this,
-        std::placeholders::_1));
+{   
+...
+  if(robot_description.empty()) {
+    create_subscription<std_msgs::msg::String>(
+      "~/robot_description",
+      rclcpp::QoS(1).transient_local(),
+      std::bind(&ControllerManager::robot_description_callback,
+        this, std::placeholders::_1));
     } 
-    ...
+...
 }
 // robot_description_callback()
 {
-    if(!resource_manager->is_urdf_already_loaded()) // check if have been called
-    // if not: get urdf, parse, and initialize
+    // check if have been called
+    if(!resource_manager->is_urdf_already_loaded()) 
+        // if not: get urdf, parse, and initialize
 }
 \end{lstlisting}
 
@@ -112,10 +119,12 @@ return_type ChainableControllerInterface::update(
 }
 \end{lstlisting}
 One thing that had to be considered was that a for a chained controller that is not in chained mode, the \lstset{language=C++,basicstyle=\small\ttfamily}\lstinline{update(time, period)} function calls the \lstset{language=C++,basicstyle=\small\ttfamily}\lstinline{update_and_write_commands(...)} before writing the commands. Like the name suggests, in this case the \glspl{ri} are updated locally with the contents from the subscribers instead of being set by a controller chained controller. This is illustrated in \autoref{c5_code_chainable_update}. However, for the \textit{JointTrajectoryController} this leads to a problem. A chained controller expects one \gls{ri} per \gls{ci} of the \textit{JointTrajectoryController}. On the other hand, if the \gls{ri} are updated by the \textit{JointTrajectory Message} of a publisher subscribed to, this message can contain multiple \textit{JointTrajectoryPoint} points. As a result, the \gls{ri} would need to be multidimensional. \newline
-As a workaround, instead of updating the \gls{ri} in the \lstset{language=C++,basicstyle=\small\ttfamily, breaklines=true}\lstinline{update_reference_from_subscribers(...)} \todo{fix}function, it is checked inside the \lstset{language=C++,basicstyle=\small\ttfamily}\lstinline{update_and_write_commands(...)} if the controller is in chained mode or not. If chained mode is enabled, then a new \textit{JointTrajectory Message} is created from the \glspl{ri} and used for calculating the trajectory. Otherwise, the \textit{JointTrajectory Message} is directly taken from the publishers.
+As a workaround, instead of updating the \gls{ri} in the function \lstset{language=C++,basicstyle=\small\ttfamily, breaklines=true}\lstinline{update_- reference_from_subscribers(...)}, it is now checked at one place inside the function \lstset{language=C++,basicstyle=\small\ttfamily}\lstinline{update_and_write_commands(...)} if the controller is in chained mode or not. If chained mode is enabled, then a new \textit{JointTrajectory Message} is created from the \glspl{ri} and used for calculating the trajectory. Otherwise, the \textit{JointTrajectory Message} is directly taken from the publishers.
 
 \subsection{Adaption of the Handles}
-As described in \autoref{c4_sec_adaption_of_handles} the \glspl{handle} are the point where the system is split.One problem that arises here is that the \glspl{handle} only store a pointer to a value of the hardware, see \autoref{c3_sec_link_ctrl_hw}. Therefore, neither a \gls{si} nor a \gls{ci} can know when the value has been changed by the hardware. This poses a problem as in the distributed case the value of the \gls{handle} should be published, if changed. There are two different ways to approach this, each with its own advantages and disadvantages.
+As described in \autoref{c4_sec_adaption_of_handles} the \glspl{handle} are the point where the system is split.One problem that arises here is that the \glspl{handle} only store a pointer to a value of the hardware, see \autoref{c3_sec_link_ctrl_hw}. Therefore, neither a \gls{si} nor a \gls{ci} can know when the value has been changed by the hardware. This poses a problem as in the distributed case the value of the \gls{handle} should be published, if changed. There are two different ways to approach this, each with its own advantages and disadvantages.The first approach is to publish the value of the \gls{handle} on timer. With this approach, the creation of the \glspl{handle} in the hardware can stay the same. \autoref{c5_fig_handle_uml} displays the adapted class hierarchy as well as the new introduced distributed \glspl{handle}. The former base class \textit{ReadOnlyHandle} has been replaced by a \textit{HandleInterface}, \textit{ReadHandleInterface} and a \textit{WriteHandleInterface}. This has been done in order to have a clear separation of readable and writable \glspl{handle}. The \textit{HandleInterface} is the base class for all \glspl{handle} and contains basic functionality as getting a full qualified name, namesapce and the like, as well as storing the pointer to the value. The \textit{ReadHandleInterface} ensures that all readably \glspl{handle} implement the \textit{get\_value()} function for retrieving the stored value of the pointer. The \textit{WriteHandleInterface} on the other hand, ensures that all writable Interfaces have a \textit{set\_value()} function for commanding the \textit{handle}. \newline
+The \textit{ReadOnlyHandle} is now only the base class of readable \glspl{handle} and not of all \glspl{handle} as before. The same applies for the \textit{ReadWriteHandle}. Next, the \textit{DistributedReadOnlyHandle} and \textit{DistributedReadWriteHandle} as well as their subclasses \textit{DistributedStateInterface} and \textit{DistributedCommandInterface} have been introduced. This change allowed to use shared pointers inside the resource storage and set the type for the \glspl{si} to \textit{ReadOnlyHandle} and \textit{ReadWriteHandle} for the \glspl{ci}. Then at runtime we can either store a \gls{si} or a distributed \gls{si} and the correct \lstset{language=C++,basicstyle=\small\ttfamily}\lstinline{get_value()} function is called with dynamic binding. The same applies for the \gls{ci} and distributed \gls{ci}. \newline
+The new introduced distributed \glspl{handle} are then for the central controller site. The central controller creates them and stores them inside its resource storage. Controllers can then claim them as they would with any \gls{ci} or \gls{si} interface. The only difference is, that for a distributed \gls{handle} the value is received over a \gls{ros2} topic from the counterpart on the sub-controller manger site and then stored inside the \gls{handle}. If a controller writes a command to a distributed \gls{ci} and the value is immediately published. \newline
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=1\textwidth]{Figures/c5/Handles_UML.pdf}
@@ -123,9 +132,6 @@ As described in \autoref{c4_sec_adaption_of_handles} the \glspl{handle} are the 
 	\label{c5_fig_handle_uml}
 \end{figure}
 \subsubsection*{Publish Value Periodically}\todo{preceice enough? More explanation of functions, details???}
-The first approach is to publish the value of the \gls{handle} on timer. With this approach, the creation of the \glspl{handle} in the hardware can stay the same. \autoref{c5_fig_handle_uml} displays the adapted class hierarchy as well as the new introduced distributed \glspl{handle}. The former base class \textit{ReadOnlyHandle} has been replaced by a \textit{HandleInterface}, \textit{ReadHandleInterface} and a \textit{WriteHandleInterface}. This has been done in order to have a clear separation of readable and writable \glspl{handle}. The \textit{HandleInterface} is the base class for all \glspl{handle} and contains basic functionality as getting a full qualified name, namesapce and the like, as well as storing the pointer to the value. The \textit{ReadHandleInterface} ensures that all readably \glspl{handle} implement the \textit{get\_value()} function for retrieving the stored value of the pointer. The \textit{WriteHandleInterface} on the other hand, ensures that all writable Interfaces have a \textit{set\_value()} function for commanding the \textit{handle}. \newline
-The \textit{ReadOnlyHandle} is now only the base class of readable \glspl{handle} and not of all \glspl{handle} as before. The same applies for the \textit{ReadWriteHandle}. Next, the \textit{DistributedReadOnlyHandle} and \textit{DistributedReadWriteHandle} as well as their subclasses \textit{DistributedStateInterface} and \textit{DistributedCommandInterface} have been introduced. This change allowed to use shared pointers inside the resource storage and set the type for the \glspl{si} to \textit{ReadOnlyHandle} and \textit{ReadWriteHandle} for the \glspl{ci}. Then at runtime we can either store a \gls{si} or a distributed \gls{si} and the correct \lstset{language=C++,basicstyle=\small\ttfamily}\lstinline{get_value()} function is called with dynamic binding. The same applies for the \gls{ci} and distributed \gls{ci}. \newline
-The new introduced distributed \glspl{handle} are then for the central controller site. The central controller creates them and stores them inside its resource storage. Controllers can then claim them as they would with any \gls{ci} or \gls{si} interface. The only difference is, that for a distributed \gls{handle} the value is received over a \gls{ros2} topic from the counterpart on the sub-controller manger site and then stored inside the \gls{handle}. If a controller writes a command to a distributed \gls{ci} and the value is immediately published. \newline
 For the sub-controller manager site, two new wrapper classes have been introduced. One is called \textit{StatePublisher} and the other \textit{CommandForwarder}. If a \gls{si} should be distributed and its value should be published, then the \gls{si} is claimed, a loan created and passed to the \textit{StatePublisher}. The \textit{StatePublisher} then checks the value of the \gls{si} periodically and publishes it. This way the \gls{si} can stay completely the same and the hardware doesn't need to know if the \gls{si} it exports is distributed or not. For a \gls{ci} the same happens with the \textit{CommandForwarder}. The only difference is, that a \textit{CommandForwarder} additionally subscribes to the topic provided by the distributed \gls{ci} at the central controller manager and on receiving a command, sets the command via loan in the actual \gls{ci}.\todo{Maybe more details? Functions and stuff? namespace or better bei weiter hinten?}
 
 In summary, the \glspl{handle} have been clearly separated into readable and writable \glspl{handle}. The distributed \glspl{handle} receive/send their value over topics. The distributed \glspl{handle} are for the central controller manager site, for the sub-controller manager site wrappers for the handles have been introduced.\todo{Remove small summary?}\newline 

@@ -47,15 +47,15 @@ Some of the key features of \gls{dds} are listed below:\todo{rewrite!!!!}
 \subsection{DDS Vendors and Implementations}
 For \gls{dds} exist a variety of different vendors and implementations. In table \ref{c3_tab_overview_rmw} an overview of a few different \gls{dds} implementations used as \gls{rmw} is given.
 \subsubsection*{Fast \gls{dds}}
-Fast \gls{dds} by eProsima is the default \gls{rmw} used since \gls{ros2} Foxy. It is at the time of writing still used as the default \gls{rmw} for \gls{ros2} Rolling. As the default \gls{rmw} it is fully supported and deployed under an Apache 2 license together with the binary releases. 
-\subsubsection*{Cyclon \gls{dds}}\todo{Write}
-Cyclon \gls{dds} is an implementation of the 
-\subsubsection*{Connext \gls{dds}}\todo{Write}
-Connext \gls{dds} is an implementation of the 
+Fast \gls{dds} by eProsima is the default \gls{rmw} used since \gls{ros2} Foxy. It is at the time of writing still used as the default \gls{rmw} for \gls{ros2} Rolling. As the default \gls{rmw} it is fully supported and deployed under an Apache 2 license together with the binary releases. \cite{noauthor_dds_nodate-1} 
+\subsubsection*{Cyclone \gls{dds}}
+Eclipse Cyclone \gls{dds}\textsuperscript{\texttrademark} is an implementation of the OMG \gls{dds} together with an implementation of the \gls{dds} Interoperability Wire Protocol (DDSI-RTPS\textsuperscript{\texttrademark}). It is a tier-1 \gls{rmw} and therefore fully supported. On Kubuntu it can either be installed via Debian packages as binary or from source. The middleware implementation is completely open source and distributed under Eclipse Distribution License 1.0 (BSD) and Eclipse Public License 2.0. \cite{anonymous_eclipse_2017, noauthor_eclipse_nodate}
+\subsubsection*{Connext \gls{dds}}
+Connext \gls{dds} is an implementation by RTI. It is fully supported as well, but only a binary installation via Debian packages is available. It is either commercially or for research purpose available. \cite{innovations_connext_nodate, noauthor_documentation_nodate}
 \subsubsection*{Zenoh}\todo{Write}
 Zenoh is a publisher, subscriber and query protocol by the Eclipse foundation.
 \href{https://www.adlinktech.com/en/Zenoh}{Zenoh} 
-\href{https://zenoh.io/blog/2021-03-23-discovery/}{Zenoh advatages} 
+\href{https://zenoh.io/blog/2021-03-23-discovery/}{Zenoh advantages} 
 
 \begin{table}[htbp]
     \centering
@@ -167,12 +167,12 @@ This whole concept is based on a \gls{sm} architecture. The drivers of the hardw
  
 \subsection{Controller Chaining}
 Controller chaining in \gls{r2c} describes the possibility to link the output of one controller to the input of another. The chaining can thereby be in sequence (cascade control) or in parallel.\newline
-For a controller to be able to be chained, it has to derive from the \textit{\seqsplit{ChainableController-Interface}} instead of the \textit{ControllerInterface}. The chainable controller must then export reference interfaces. Those reference interfaces have the same meaning as the \textit{CommandInterfaces}. The controller can then run in either chained or external mode, where the latter is equivalent to a non chainable controller. If the controller runs in chained mode, all external interfaces like subscriber and services are disabled. This is done in order to avoid concurrency in the input commands. Another controller can then claim the reference interfaces and chain its output to the input of the chainable controller.
+For a controller to be able to be chained, it has to derive from the \textit{\seqsplit{ChainableController-Interface}} instead of the \textit{ControllerInterface}. The chainable controller must then export reference interfaces. Those reference interfaces have the same meaning as the \glspl{ci}. The controller can then run in either chained or external mode, where the latter is equivalent to a non chainable controller. If the controller runs in chained mode, all external interfaces like subscriber and services are disabled. This is done in order to avoid concurrency in the input commands. Another controller can then claim the reference interfaces and chain its output to the input of the chainable controller.
 
 \subsection{Controlling Multiple Robots with \gls{r2c}}\label{c3_sec_controlling_multiple_robots}
 In the current state, \gls{r2c} focuses on controlling a single robot or robot cell. Further, the focus thereby lies on using a single computer to run the whole control stack. This includes the drivers used for communication with the hardware, the controller manager and controllers.\newline
 Controlling multiple robots is however possible. Depending on the task, control of multiple robots in the current state of \gls{r2c} can roughly be split into two scenarios.
-\begin{enumerate}[start=1,label={\upshape \texttt{Scenario \arabic*:}},wide = 0pt, leftmargin = 3em]
+\begin{enumerate}[start=1,label={\upshape \texttt{Scenario \arabic*:}}, wide = 0pt, leftmargin = 3em]
     \item Task where tight synchronization is needed. $\implies$ One platform with one controller manager. Represented in figure \ref{c3_fig_r2c_mr_ts}.
     \item Task where robots act more or less independent of one another. $\implies$ Multiple platforms with multiple independent controller managers. This can be seen in graphic \ref{c3_fig_r2c_mr_is}.
 \end{enumerate}
@@ -204,103 +204,3 @@ In this case, however, the systems are completely independent of each other. Thi
 % \section{Time Synchronized Networks}
 % What's the difference?????
 % \section{Time Sensitive Networks}
-
-\section{The Used Hardware}\todo{Add network?}
-The evaluation is done on real hardware. For the evaluation, multiple computers as well as multiple robots are used. In the following, a short overview of the computers and robots is given.
-\subsection{Computers}
-It was no specially for control or real-time tasks designed hardware used. The used computers are three off the shelf laptops. A detailed overview of the exact hardware specifications of the laptops used is shown in Table \ref{c3_tab_pc_overview}. It includes the processor and network card of the laptops, as well as the size of the RAM and what type of RAM was used. The first computer (PC1) is a Tuxedo Polaris AMD Gen3. The second one (PC2) a Lenovo Legion 5 15ACH6H and the third computer (PC3) a Lenovo Legion 5 Pro 16ARH7H.\newline
-The setup on the laptops itself was on each the same. A fresh Kubuntu 22.04 was installed. The real-time Kernel was installed via the Ubuntu \texttt{pro} command. As \gls{ros2} distro Rolling was chosen and the basis for the changes of the \gls{r2c} and \textit{ros2\_controllers} repositories is listed in table \ref{c3_tab_pc_overview}.
-% Network card : lshw command
-% cpu : lscpu
-% memory: sudo dmidecode --type 17
-% 1 -> arbeitslaptop
-% 2 -> mein laptop
-% 3 -> yaxin laptop
-
-\begin{table}[htbp]
-    \centering
-\begin{tabular}{ |c|c|c|c| }
-\hline
-\multicolumn{4}{|c|}{Overview of PCs used for the evaluation} \\
-\hline
-& PC1 & PC2 & PC3  \\
-\hline
-\hline
-\textbf{Hardware} &  &  & \\\hline
-    Processor &
-        \begin{minipage}{3.7cm}
-	       \vskip 8pt
-		      16 $\times$ AMD Ryzen 7 5800H with Radeon Graphics
-	       \vskip 8pt
-	    \end{minipage} & 
-        \begin{minipage}{3.7cm}
-    	    \vskip 8pt
-    		   12 $\times$ AMD Ryzen 5 5600H with Radeon Graphics
-    	    \vskip 8pt
-	    \end{minipage} & 
-        \begin{minipage}{3.7cm}
-	       \vskip 8pt
-		      16 $\times$ AMD Ryzen 7 6800H with Radeon Graphics
-	       \vskip 8pt
-	    \end{minipage} \\\hline
-    RAM &
-        \begin{minipage}{3.7cm}
-	       \vskip 8pt
-		      2 $\times$ 32GB DDR4 Samsung SODIMM 3200 MT/s
-	       \vskip 8pt
-	    \end{minipage} & 
-        \begin{minipage}{3.7cm}
-    	    \vskip 8pt
-    		   2 $\times$ 16GB DDR4 SODIMM 3200 MT/s
-    	    \vskip 8pt
-	    \end{minipage} & 
-        \begin{minipage}{3.7cm}
-	       \vskip 8pt
-		      2 $\times$ 16GB DDR5 SODIMM 4800 MT/s
-	       \vskip 8pt
-	    \end{minipage} \\\hline
-    Network Card &
-        \begin{minipage}{3.7cm}
-	       \vskip 8pt
-		      Realtek Semiconductor Co., LtdRTL8125 2.5GbE Controller 1Git/s
-	       \vskip 8pt
-	    \end{minipage} & 
-        \begin{minipage}{3.7cm}
-    	   \vskip 8pt
-    		Realtek Semiconductor Co., RTL8111/ 8168/8411 PCI Express 1Gbit/s
-    	   \vskip 8pt
-	    \end{minipage} & 
-        \begin{minipage}{3.7cm}
-          \vskip 8pt
-		      Realtek Semiconductor Co., RTL8111/ 8168/8411 PCI Express 1Gbit/s
-	       \vskip 8pt
-	    \end{minipage} \\\hline\hline
-\textbf{Setup} & & & \\\hline
-    Operating System & Kubuntu 22.04 &  Kubuntu 22.04 & Kubuntu 22.04 \\\hline
-    Kernel & 5.15.0-1039-realtime & 5.15.0-1039-realtime & 5.15.0-1039-realtime  \\\hline
-    Real-time Kernel & PREEMPT\_RT & PREEMPT\_RT & PREEMPT\_RT \\\hline
-    ROS version & Rolling & Rolling & Rolling \\\hline
-        \begin{minipage}{3cm}
-        \vskip 4pt
-    		   ros2\_control based on commit:\vskip 8pt
-	    \end{minipage} & 0eb319ea43b78b886a & 0eb319ea43b78b886a & 0eb319ea43b78b886a \\\hline
-            \begin{minipage}{3cm}
-        \vskip 4pt
-    		   ros2\_controllers based on commit:\vskip 8pt
-	    \end{minipage} & 05d7a5ec73a02eab2c & 05d7a5ec73a02eab2c & 05d7a5ec73a02eab2c \\\hline
-\end{tabular}
-    \caption{Three different computers were used for the evaluation. The table gives an overview of the used hardware, as well as the setup on each of the computers.}
-    \label{c3_tab_pc_overview}
-\end{table}
-\subsection{Robots for Evaluation}\label{c3_sec_used_robots}
-The used robots for the evaluation are the KUKA KR 3 R540 \cite{noauthor_agile_nodate, noauthor_kuka_kr_3_agiluspdf_nodate} \todo{Write}
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=1\textwidth]{Figures/c3/robot_and_cell.pdf}
-	\caption{On the left, the KUKA KR 3 R540 is shown. Picture taken from \cite{noauthor_kuka_kr_3_agiluspdf_nodate}. On the right the \textit{ready2\_educate} platform is depicted in which the robots are mounted. Picture from \cite{noauthor_ready2_educate_nodate}.}
-	\label{c3_fig_r2c_mr_is}
-\end{figure}
-
-
-
-

@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2023-06-21T09:39:25.208Z" agent="Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/114.0" etag="3ehcSXEOCcozUve4_E_x" version="21.5.0">
+<mxfile host="app.diagrams.net" modified="2023-06-24T15:39:37.980Z" agent="Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/114.0" etag="my9uzem03T0tANNy613R" version="21.5.0">
   <diagram name="Page-1" id="56QPCwbd0cLktFSz25ie">
-    <mxGraphModel dx="4024" dy="2871" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="8257" dy="5233" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -36,7 +36,7 @@
         <mxCell id="k2swmo7qzIprsYgqh0As-4" value="&lt;font style=&quot;font-size: 40px;&quot;&gt;Sub-Controller Manager 1 (SCM 1)&lt;br&gt;&lt;/font&gt;" style="swimlane;whiteSpace=wrap;html=1;startSize=60;strokeWidth=4;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
           <mxGeometry x="40" y="560" width="1220" height="870" as="geometry" />
         </mxCell>
-        <mxCell id="k2swmo7qzIprsYgqh0As-5" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;Joint Trajectory Controller 1&lt;br&gt;&lt;/font&gt;" style="swimlane;whiteSpace=wrap;html=1;startSize=60;strokeWidth=4;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="k2swmo7qzIprsYgqh0As-4" vertex="1">
+        <mxCell id="k2swmo7qzIprsYgqh0As-5" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;Chained JointTrajectoryController 1&lt;br&gt;&lt;/font&gt;" style="swimlane;whiteSpace=wrap;html=1;startSize=85;strokeWidth=4;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="k2swmo7qzIprsYgqh0As-4" vertex="1">
           <mxGeometry x="760" y="295" width="440" height="280" as="geometry" />
         </mxCell>
         <mxCell id="k2swmo7qzIprsYgqh0As-29" value="&lt;div&gt;&lt;b&gt;&lt;font style=&quot;font-size: 35px;&quot;&gt;Loaned Command-&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;&lt;font style=&quot;font-size: 35px;&quot;&gt;/Stateinterfaces&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="k2swmo7qzIprsYgqh0As-5" vertex="1">
@@ -146,11 +146,11 @@
         <mxCell id="Qk9qD6PRYy8a2zJd2hO1-25" value="&lt;font style=&quot;font-size: 40px;&quot;&gt;Central Controller Manager (CCM)&lt;br&gt;&lt;/font&gt;" style="swimlane;whiteSpace=wrap;html=1;startSize=60;strokeWidth=4;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
           <mxGeometry x="850" y="-670" width="1190" height="640" as="geometry" />
         </mxCell>
-        <mxCell id="Qk9qD6PRYy8a2zJd2hO1-26" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;Chained Forwarding Controller&lt;br&gt;&lt;/font&gt;" style="swimlane;whiteSpace=wrap;html=1;startSize=60;strokeWidth=4;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="Qk9qD6PRYy8a2zJd2hO1-25" vertex="1">
-          <mxGeometry x="710" y="200" width="460" height="280" as="geometry" />
+        <mxCell id="Qk9qD6PRYy8a2zJd2hO1-26" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;Chained ForwarCommandController&lt;br&gt;&lt;/font&gt;" style="swimlane;whiteSpace=wrap;html=1;startSize=90;strokeWidth=4;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="Qk9qD6PRYy8a2zJd2hO1-25" vertex="1">
+          <mxGeometry x="690" y="180" width="480" height="320" as="geometry" />
         </mxCell>
         <mxCell id="Qk9qD6PRYy8a2zJd2hO1-27" value="&lt;div&gt;&lt;b&gt;&lt;font style=&quot;font-size: 35px;&quot;&gt;Loaned Command-&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;&lt;font style=&quot;font-size: 35px;&quot;&gt;/Stateinterfaces&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="Qk9qD6PRYy8a2zJd2hO1-26" vertex="1">
-          <mxGeometry x="75" y="100" width="290" height="140" as="geometry" />
+          <mxGeometry x="80" y="130" width="290" height="140" as="geometry" />
         </mxCell>
         <mxCell id="Qk9qD6PRYy8a2zJd2hO1-43" value="&lt;div&gt;&lt;b&gt;&lt;font style=&quot;font-size: 35px;&quot;&gt;Command-&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;&lt;font style=&quot;font-size: 35px;&quot;&gt;/Stateinterface&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;&lt;font style=&quot;font-size: 35px;&quot;&gt;imports of&lt;br&gt;&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;&lt;font style=&quot;font-size: 35px;&quot;&gt;SCMs&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="Qk9qD6PRYy8a2zJd2hO1-25" vertex="1">
           <mxGeometry x="80" y="250" width="290" height="220" as="geometry" />
@@ -177,14 +177,14 @@
             <mxPoint x="-46" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="Qk9qD6PRYy8a2zJd2hO1-57" value="&lt;b&gt;&lt;font style=&quot;font-size: 80px;&quot;&gt;&amp;nbsp;Machine 1&lt;br&gt;&lt;/font&gt;&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-          <mxGeometry x="415" y="290" width="430" height="110" as="geometry" />
+        <mxCell id="Qk9qD6PRYy8a2zJd2hO1-57" value="&lt;b&gt;&lt;font style=&quot;font-size: 80px;&quot;&gt;PC 2&lt;br&gt;&lt;/font&gt;&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="530" y="290" width="200" height="110" as="geometry" />
         </mxCell>
-        <mxCell id="Qk9qD6PRYy8a2zJd2hO1-59" value="&lt;b&gt;&lt;font style=&quot;font-size: 80px;&quot;&gt;&amp;nbsp;Machine 2&lt;br&gt;&lt;/font&gt;&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-          <mxGeometry x="1985" y="290" width="430" height="110" as="geometry" />
+        <mxCell id="Qk9qD6PRYy8a2zJd2hO1-59" value="&lt;b&gt;&lt;font style=&quot;font-size: 80px;&quot;&gt;PC 3&lt;br&gt;&lt;/font&gt;&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="2100" y="290" width="200" height="110" as="geometry" />
         </mxCell>
-        <mxCell id="Qk9qD6PRYy8a2zJd2hO1-61" value="&lt;b&gt;&lt;font style=&quot;font-size: 80px;&quot;&gt;&amp;nbsp;Machine M&lt;br&gt;&lt;/font&gt;&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-          <mxGeometry x="1165" y="-920" width="450" height="110" as="geometry" />
+        <mxCell id="Qk9qD6PRYy8a2zJd2hO1-61" value="&lt;b&gt;&lt;font style=&quot;font-size: 80px;&quot;&gt;PC 1&lt;br&gt;&lt;/font&gt;&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="1290" y="-920" width="200" height="110" as="geometry" />
         </mxCell>
         <mxCell id="aH2ZuujqSojjc6NItEgd-3" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 4;strokeWidth=6;rounded=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;jumpSize=2;jumpStyle=none;targetPerimeterSpacing=0;" parent="1" source="k2swmo7qzIprsYgqh0As-3" target="aH2ZuujqSojjc6NItEgd-2" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
@@ -227,7 +227,7 @@
         <mxCell id="aH2ZuujqSojjc6NItEgd-8" value="&lt;font style=&quot;font-size: 40px;&quot;&gt;Sub-Controller Manager 2 (SCM 2)&lt;br&gt;&lt;/font&gt;" style="swimlane;whiteSpace=wrap;html=1;startSize=60;strokeWidth=4;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
           <mxGeometry x="1610" y="560" width="1210" height="870" as="geometry" />
         </mxCell>
-        <mxCell id="aH2ZuujqSojjc6NItEgd-9" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;Joint Trajectory Controller 2&lt;br&gt;&lt;/font&gt;" style="swimlane;whiteSpace=wrap;html=1;startSize=60;strokeWidth=4;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="aH2ZuujqSojjc6NItEgd-8" vertex="1">
+        <mxCell id="aH2ZuujqSojjc6NItEgd-9" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;Chained JointTrajectoryController 2&lt;br&gt;&lt;/font&gt;" style="swimlane;whiteSpace=wrap;html=1;startSize=80;strokeWidth=4;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="aH2ZuujqSojjc6NItEgd-8" vertex="1">
           <mxGeometry x="740" y="230" width="440" height="280" as="geometry" />
         </mxCell>
         <mxCell id="aH2ZuujqSojjc6NItEgd-10" value="&lt;div&gt;&lt;b&gt;&lt;font style=&quot;font-size: 35px;&quot;&gt;Loaned Command-&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;&lt;font style=&quot;font-size: 35px;&quot;&gt;/Stateinterfaces&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="aH2ZuujqSojjc6NItEgd-9" vertex="1">
@@ -370,10 +370,10 @@
         <mxCell id="aH2ZuujqSojjc6NItEgd-47" value="&lt;font style=&quot;font-size: 47px;&quot; color=&quot;#990000&quot;&gt;Export via ROS2 Service&lt;br&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="1345" y="105" width="540" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="qldwvl_S3cvVEVpTKYVX-1" value="&lt;font style=&quot;font-size: 45px;&quot;&gt;Driver for &lt;br&gt;Robot 1&lt;br&gt;&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=3;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="qldwvl_S3cvVEVpTKYVX-1" value="&lt;font style=&quot;font-size: 45px;&quot;&gt;Driver for &lt;br&gt;Robot 1&lt;br&gt;&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=3;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="830" y="1220" width="340" height="160" as="geometry" />
         </mxCell>
-        <mxCell id="qldwvl_S3cvVEVpTKYVX-2" value="&lt;font style=&quot;font-size: 45px;&quot;&gt;Driver for &lt;br&gt;Robot 2&lt;br&gt;&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=3;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="qldwvl_S3cvVEVpTKYVX-2" value="&lt;font style=&quot;font-size: 45px;&quot;&gt;Driver for &lt;br&gt;Robot 2&lt;br&gt;&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=3;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="2350" y="1220" width="340" height="160" as="geometry" />
         </mxCell>
       </root>
