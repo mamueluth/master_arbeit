@@ -18,7 +18,7 @@ A central machine with a high-level controller and distributed low-level control
 
 
 \section{Concept Overview}\label{c4_sec_overview}
-In order to achieve the previously mentioned goals, a conceptual design composed of one central and multiple sub-controller managers is proposed. A schematic overview of the proposed concept is given in \autoref{c4_fig_concept_overview} and discussed in the following. It should be noted that both the central controller manager and the sub-controller managers may well manage multiple systems. For the sake of simplicity, we will focus on the case where each sub-controller manager manages exactly one system. The central controller manager does not manage a system in this example. Moreover, in our case, the system represents a robot. One should also note, that instead of being a system, it could also be an actuator or sensor.\newline
+In order to achieve the previously mentioned goals, a conceptual design composed of one central and multiple sub-controller managers is proposed. A schematic overview of the proposed concept is given in \autoref{c4_fig_concept_overview} and discussed in the following. It should be noted that both the central controller manager and the sub-controller managers may well manage multiple systems. For the sake of simplicity, it is focused only on the case where each sub-controller manager manages exactly one system. The central controller manager does not manage a system in this example. Moreover, in our case, the system represents a robot. One should also note, that instead of being a system, it could also be an actuator or sensor.\newline
 As shown in the schematic representation \autoref{c4_fig_concept_overview}, each of the controller manager runs on its own machine. The central controller manager thereby acts as a coordinating entity, while the sub-controller managers are responsible for managing individual systems within the overall architecture.\newline
 \begin{figure}[htbp]
 	\centering
@@ -44,7 +44,7 @@ In summary, the system architecture consists of a central controller manager and
 \section{Integration in \gls{r2c}}
 \subsection{New Types of \gls{ci} and \gls{si}}\label{c4_sec_adaption_of_handles}
 As shown in the UML class diagram in \autoref{c3_fig_ros2_control_uml} the link between the hardware side and the controllers in the \gls{r2c} framework are the \glspl{ci} and \glspl{si}. See \autoref{c3_sec_link_ctrl_hw} for a more detailed explanation of the conceptual background. \newline
-The fundamental idea of the design is to split the system at this point. We then introduce new distributed types of \gls{ci} and \gls{si} and wrappers for the \gls{ci} and \gls{si}. Those new distributed types of handles have the same interfaces as the normal \glspl{ci} and \glspl{si} 
+The fundamental idea of the design is to split the system at this point. Then new distributed types of \gls{ci} and \gls{si} and wrappers for the \gls{ci} and \gls{si} are introduced. Those new distributed types of handles have the same interfaces as the normal \glspl{ci} and \glspl{si} 
 \begin{figure}[htbp]
 	\centering
     \includegraphics[width=1\textwidth]{Figures/C4/simple_concept.drawio.pdf}
@@ -52,7 +52,7 @@ The fundamental idea of the design is to split the system at this point. We then
 	\label{c4_fig_simple_concept}
 \end{figure}
 but internally they have a \gls{ros2} node and create publishers and subscribers. This is shown in \autoref{c4_fig_simple_concept}. \newline
-We have to distinguish between the central controller manager side and the sub-controller manager side. For the central controller manager side, a distributed \gls{si} needs to receive the value, while on the sub-controller manager side the value has to be published. For distributed \glspl{ci} the same logic applies. Additionally, for writing the commands, the distributed \gls{ci} needs to publish the value set on the central controller manager's side. This command then needs to be received by the \gls{ci} on the sub-controller manager side. On the sub-controller manager side, the \glspl{ci} and \glspl{si} which should be made available for the central controller manager, are then claimed and added to a wrapper classes. Claiming of the interfaces ensures that no other controller can claim them locally and issue commands to them. The wrapper classes are needed so that the \gls{si} and \gls{ci} can remain the same. This way, the hardware drivers do not need to be changed. One type of wrapper class is needed for the \gls{si} and one for the \gls{ci}.  The wrappers are stored inside the resource storage of the sub-controller manager. Further, the wrapper classes then publish the state of the \glspl{ci} and \glspl{si}, as well as receive the commands for the \glspl{ci}. On the central controller side the new types of distributed interfaces are created which act as counterparts to the wrapper classes on the sub-controller manager side. As can be seen in \autoref{c4_fig_simple_concept}, the new types of \glspl{ci} and \glspl{si} on the central controller manager's side are stored inside the \textit{ResourceStorage} as normal \glspl{ci} and \glspl{si} are.\newline 
+It has to be distinguished between the central controller manager side and the sub-controller manager side. For the central controller manager side, a distributed \gls{si} needs to receive the value, while on the sub-controller manager side the value has to be published. For distributed \glspl{ci} the same logic applies. Additionally, for writing the commands, the distributed \gls{ci} needs to publish the value set on the central controller manager's side. This command then needs to be received by the \gls{ci} on the sub-controller manager side. On the sub-controller manager side, the \glspl{ci} and \glspl{si} which should be made available for the central controller manager, are then claimed and added to a wrapper classes. Claiming of the interfaces ensures that no other controller can claim them locally and issue commands to them. The wrapper classes are needed so that the \gls{si} and \gls{ci} can remain the same. This way, the hardware drivers do not need to be changed. One type of wrapper class is needed for the \gls{si} and one for the \gls{ci}.  The wrappers are stored inside the resource storage of the sub-controller manager. Further, the wrapper classes then publish the state of the \glspl{ci} and \glspl{si}, as well as receive the commands for the \glspl{ci}. On the central controller side the new types of distributed interfaces are created which act as counterparts to the wrapper classes on the sub-controller manager side. As can be seen in \autoref{c4_fig_simple_concept}, the new types of \glspl{ci} and \glspl{si} on the central controller manager's side are stored inside the \textit{ResourceStorage} as normal \glspl{ci} and \glspl{si} are.\newline 
 The information of what distributed \glspl{ci} and \glspl{si} and which publishers and subscribers should be created is made available with the registration. The registration process and what is created, stored and managed where is explained in more detail in the following sections.
 
 \subsection{Conceptual Registration of a Sub-Controller Manager}\label{c4_sec_registraion_csi}
@@ -118,59 +118,3 @@ The sub-controller manager performs the following tasks to facilitate the chaini
 In summary, the conceptual registration process and chaining of controllers between the sub-controller manager and the central controller manager involves registration of the \glspl{ri} created by a controller of the sub-controller manager. Further, a connection between the output of the central controller managers controller and the input of the sub-controller managers controller is established. This allows for chaining of controllers running on different machines. Moreover, with the proposed procedure, the controllers as well as the process for chaining and exporting of \glspl{ri} can stay the same and no changes need to be done.
 \missingfigure{vllt ablauf diagram für registraion}
 \missingfigure{vllt ablauf diagramm für reference.}
-% \subsection{Old remove}
-% \paragraph{Concept}
-% \begin{itemize}
-%     \item \textbf{Conceptual Design:}
-%     \begin{itemize}
-%         \item split at the handles - done
-%         \item have central- and subcontrollermanagers - done 
-%         \item use topics to publish data -done
-%     \end{itemize}
-%     \item \textbf{Integration into \gls{r2c}}
-%     \item Separated drivers:
-%     \begin{itemize}
-%         \item registration - done 
-%         \item creation of topics - done 
-%     \end{itemize}
-%         \item Controller Chaining:
-%     \begin{itemize}
-%         \item registration
-%         \item creation of topics - done 
-%         \item activation of chain - done 
-%     \end{itemize}
-% \end{itemize}
-% \paragraph{registraiont for controllers}
-% \begin{itemize}
-%     \item \textbf{Subcontroller manager:}
-%     \begin{itemize}
-%         \item register subcontroller manager $\implies$ export descriptions of Command-/SystemInterfaces
-%         \item create publisher for Command-/\glspl{si}
-%         \item wait for registration to successfully complete
-%         \item subscribe to commandpublisher received from central controller manager
-%     \end{itemize}
-%     \item \textbf{Central Controller manager:}
-%     \begin{itemize}
-%         \item create service for registration
-%         \item register subcontroller manger if receive call
-%         \item subscribe to publisher of Command-/StateInteface of subcontrolelr manager
-%         \item create special Command-/\glspl{si} for this
-%         \item create publisher for Commands
-%         \item proceed as normal
-%     \end{itemize}
-% \end{itemize}
-% \paragraph{Controller Chaining}
-% \begin{itemize}
-%     \item \textbf{Subcontroller manager:}
-%     \begin{itemize}
-%         \item same as for simple case
-%         \item export additionally \glspl{ri}
-%     \end{itemize}
-%     \item \textbf{Central Controller manager:}
-%     \begin{itemize}
-%         \item same as simple case
-%         \item import \glspl{ri}
-%         \item create chained controller
-%         \item proceed as normal
-%     \end{itemize}
-% \end{itemize}

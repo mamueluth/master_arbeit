@@ -161,7 +161,7 @@ where $SS_{res}$ is the residual sum of squares and $SS_{tot}$ is the total sum 
     History & KEEP\_LAST &  
         \begin{minipage}{6cm}
 	       \vspace{8pt}
-		      We keep only the last sample.
+		      Only the last sample is kept.
 	       \vspace{8pt}
 	    \end{minipage} \\\hline
     Depth & 1 &  
@@ -203,7 +203,7 @@ where $SS_{res}$ is the residual sum of squares and $SS_{tot}$ is the total sum 
     History & KEEP\_LAST &  
         \begin{minipage}{6cm}
 	       \vspace{8pt}
-		      We keep only the last 5 sample.
+		      Only the last 5 samples are kept.
 	       \vspace{8pt}
 	    \end{minipage} \\\hline
     Depth & 5 &  
@@ -239,11 +239,11 @@ The different scenarios, as well as the code and settings used for the evaluatio
 The collected data, the code used for calculating the statistical measures and creation of the plots can be found in this \href{https://github.com/mamueluth/ma_evaluation}{repository} \cite{muth_mamueluthma_evaluation_2023}.
 
 \section{Scenario 1: Distributed Drivers}
-Scenario 1 evaluates the "distributed drivers" case described in \autoref{c4_sec_distributed_drivers}. A schematic overview can be seen \autoref{c6_fig_test_scenario_1}. As shown, the scenario consists of all three computers and the two KUKA KR 3. The computers and robots were set up and connected as described in \autoref{c6_sec_setup_all}.\newline
+Scenario 1 evaluates the "Distributed Drivers" case described in \autoref{c4_sec_distributed_drivers}. A schematic overview can be seen \autoref{c6_fig_test_scenario_1}. As shown, the scenario consists of all three computers and the two KUKA KR 3. The computers and robots were set up and connected as described in \autoref{c6_sec_setup_all}.\newline
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=1\textwidth]{Figures/c6/test_scenario_1.pdf}
-	\caption{Schematic overview of scenario 1: distributed drivers. The machines, controller managers and controller topology is shown. As can be seen, the central controller manager runs a \textit{JointTrajectoryController}, while the two distributed machines run the drivers for communication with the robots. }
+	\caption{Schematic overview of scenario 1: Distributed Drivers. The machines, controller managers and controller topology is shown. As can be seen, the central controller manager runs a \textit{JointTrajectoryController}, while the two distributed machines run the drivers for communication with the robots. }
 	\label{c6_fig_test_scenario_1}
 \end{figure}
 \subsection{Experimental Setup}
@@ -338,7 +338,7 @@ In \autoref{c6_fig_s1_connext_box_aio} the results for the metrics for the devia
 When using the reliable profile for Connext DDS, the jitter further increases. This is visible in the higher \gls{iqr}, the greater standard deviation and the greater absolute deviation in \autoref{c6_tab_evaluation_orverview}. This is consistent with the results presented before, as the reliable profile always performs slightly worse than the sensor profile.
 
 It can be concluded that with Connext DDS, the robots still move in a more or less synchronous manner. No remarkable curvatures are observed during the executed motions. However, the robots experience significant jitter during the execution. As it was the case with Fast DDS and Cyclone DDS, the sensor profile performs better than the reliable profile.
-\section{Summary}
+\subsection{Summary}
 In \autoref{c6_tab_evaluation_orverview} the average for the execution of three rotations is shown. Compared are Fast \gls{dds} by eProsima, Cyclone \gls{dds} by Eclipse and Connext \gls{dds} by RTI, as well as the reliable and sensor profile. The results are divided in the average results for the ascending edge in the upper part of the table and the average results of the descending edge in the lower part. The values highlighted in blue indicate the best value for each row, while the red highlighting indicates the worst value for each row.
 \begin{table}[htbp]
 \begin{tabular}{|l|ll|ll|ll|}
@@ -394,7 +394,7 @@ In summary, it can be said that the usage of the sensor profile yields better re
 
 
 \section{Scenario 2: Distributed Chained Control}
-Scenario 2 evaluates the "distributed chained control" case described in \autoref{c4_sec_distributed_controller_chaining}. A schematic overview can be seen in \autoref{c6_fig_test_scenario_2}. As shown, the scenario consists of all three computers and the two KUKA KR3 R540. The computers and robots were connected and set up as described in \autoref{c6_sec_description}.
+Scenario 2 evaluates the "Distributed Chained Control" case described in \autoref{c4_sec_distributed_controller_chaining}. A schematic overview can be seen in \autoref{c6_fig_test_scenario_2}. As shown, the scenario consists of all three computers and the two KUKA KR3 R540. The computers and robots were connected and set up as described in \autoref{c6_sec_description}.
 
 \subsection{Experimental Setup}
 As can be seen in \autoref{c6_fig_test_scenario_2} the central controller manager was started on PC1. The central controller manager had a \textit{ForwardCommandController} running. The sub-controller managers were started on PC2 and PC3. The driver for controlling the first robot was executed on PC2 and the driver for controlling the second robot was executed on PC3. In addition to the driver on PC2 and PC3, on each of the sub-controller managers had a \textit{JointTrajectoryController} running. On the central controller manager was a \textit{ForwardCommandController} executed. The \textit{ForwardCommandController} was chained to the \textit{JointTrajectoryControllers} of the sub-controller managers. This means that the \textit{JointTrajectoryControllers} of the sub-controller managers claim the \glspl{ci} locally, create \glspl{ri} and register them at the central controller manager. With this setup, the \textit{ForwardCommandController} creates a trajectory message. The trajectory message is then sent to the input of\textit{JointTrajectoryControllers} via the exported reference interfaces. This means that in comparison to scenario 1 where the central controller manager's \textit{JointTrajectoryController} calculated the issued commands in order to execute the trajectory, the calculation was now done separate for each robot by the \textit{JointTrajectoryControllers} of the sub-controller managers. This greatly reduces the traffic sent over the \gls{rmw}, as only one "JointTrajectory message" every few second needs to be sent instead of the calculated commands for the \glspl{ci}. On the other hand, as the time of the computers was not synchronized, a simultaneous start of the execution of the trajectory can not be expected. As a result, the influence of the used \gls{rmw} is restricted to the initial "JointTrajectory message" sent via the \gls{ri}. After the message has been sent, the commands are calculated separately by each sub-controller manager and sent to the robot controller via \gls{rsi}. \newline
@@ -402,7 +402,7 @@ As in scenario 1 the first robot was started fully extended to the front (joint\
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=1\textwidth]{Figures/c6/test_scenario_2.pdf}
-	\caption{Schematic overview of scenario 2: distributed chained controllers. The machines, controller manager and controller topology are shown. As can be seen, the central controller manager runs a \textit{ForwardCommandController}, while the two distributed machines run a \textit{JointTrajectoryController} and the drivers for communication with the robots. The output of the \textit{ForwardCommandController} is chained to each of the inputs of the \textit{JointTrajectoryControllers}.}
+	\caption{Schematic overview of scenario 2: Distributed Chained Control. The machines, controller manager and controller topology are shown. As can be seen, the central controller manager runs a \textit{ForwardCommandController}, while the two distributed machines run a \textit{JointTrajectoryController} and the drivers for communication with the robots. The output of the \textit{ForwardCommandController} is chained to each of the inputs of the \textit{JointTrajectoryControllers}.}
 	\label{c6_fig_test_scenario_2}
 \end{figure}
 
@@ -412,23 +412,12 @@ As in scenario 1 the first robot was started fully extended to the front (joint\
 	\caption{Distance course for one rotation. The measured distance values are in blue, the estimated trend of the values in red. On the left is Fast DDS as \gls{rmw} on the right Connext DDS. The orange circles indicate notable deviations at the start and end of the rotation, meaning that the robots did not start to move simultaneously.}
 	\label{c6_fig_s2_fast_vs_connext}
 \end{figure}
+\subsection{Results}
 In \autoref{c6_fig_s2_fast_vs_connext} an example rotation is shown. On the left side for Fast DDS and on the right site for Connext DDS. The measured distance values are plotted in blue, and the estimated line by \gls{ran} is displayed in red. The orange circles highlight clearly visible deviations immediately after the start and near the end of the rotations, as the robots do not start in sync. During the rotation, the line is almost perfectly linear. The effect is in particular visible for Connext DDS. At the start of the rotation at circa t=23.25s, a very steep curvature can be observed, as only the first robot starts moving. Then the second robot starts moving as well and the distance values form a straight line with nearly no deviations noticeable from the values estimated by \gls{ran}. Then, as the first robot reaches the goal pose and waits, again a curvature is visible. This curvature is indicating the closing-in of the second robot on the goal pose.\newline
 This is expected, as the resulting motion calculated by each of the \textit{JointTrajectoryControllers} of each of the sub-controller managers, output a constant velocity. This means, that the robots may not start simultaneously, but once they start moving, they both move with a constant speed. As already mentioned before, the \gls{rmw} does not have a great influence in this. This is due to the fact, that the commands are no longer calculated at a central point and sent via \gls{dds} over the network at each time step. Instead, the commands are calculated and issued locally to the \gls{ci}, before sent via the driver and \gls{rsi} to the robot controller. This is a distinct difference to scenario 1 as the time of the execution is not synchronized. As a result, the curvatures at the beginning and end of the executions vary greatly. The trend of Connext DDS performing worse than its competitors seems to continue, as the curvatures with Connext DDS are greater than those seen with Fast DDS or Connext DDS. This is probably due to the fact that the "Trajectory messages" sent over the \glspl{ri} arrive with a greater time delay than it is the case with Fast DDS or Connext DDS. Nonetheless, the collected data only consist of around 30 rotations for each \gls{rmw}, further investigation should be done.
 
-In summary, it can be said that the concept of distributed chained control works. The arrival of the "Trajectory messages" influences the start time of each of the robots motions. The results indicate that in order to guarantee a simultaneous start of the execution of the trajectory, further synchronization is needed. 
+In summary, it can be said that the concept of "Distributed Chained Control" works. The arrival of the "Trajectory messages" influences the start time of each of the robots motions. The results indicate that in order to guarantee a simultaneous start of the execution of the trajectory, further synchronization is needed. 
 
 \section*{Side Note}
 The concept has been tested with the execution of complex trajectories, but only been checked visually as the limited reach of the distance sensor and the placement of the robots inside the \textit{ready2\_educate} platform limited the ways the robots could be coupled.\newline
 Moreover, the concept has also been tested with a KUKA KR 5 and a KUKA KR 16-2. One notable difference is that the industrial controllers for those two robots have different cycle time. For communication with the KUKA KR 5 over the \gls{rsi} the controller expects a period of 4 \si{\milli\second}, while the controller of the KUKA KR 16-2 expects a cycle time of 12 \si{\milli\second}. The robots seemed to move in sync, however a detailed analysis could not be conducted. The robots are about 5 m away from each other, with the reach of the distance sensor an evaluation was not feasible. 
-
-
-% \begin{itemize}
-%     \item \todoin{should probably test with different network workloads}
-%     \item \todoin{Different Publishing types}
-%         \begin{enumerate}
-%             \item Node topology
-%             \item Publish trigger
-%             \item Publish type 
-%         \end{enumerate}
-%     \item \todoin{What about Zenoh?}
-% \end{itemize}
